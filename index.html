@@ -364,4 +364,201 @@ Responda APENAS com JSON válido, sem markdown, sem explicações:
   "tags": ["tag1", "tag2", "tag3"],
   "descricao": "descrição curta e específica em português, ex: notebook Dell preto sobre mesa"
 }
-Seja específico: prefira 'tênis Nike branco' a apenas 'sapato'. Use por
+Seja específico: prefira 'tênis Nike branco' a apenas 'sapato'. Use português do Brasil.`;
+
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { text: prompt },
+              { inline_data: { mime_type: 'image/jpeg', data: photoData } }
+            ]
+          }],
+          generationConfig: { temperature: 0.1, maxOutputTokens: 300 }
+        })
+      }
+    );
+
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      throw new Error(e.error?.message || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    // Remove markdown se vier
+    text = text.replace(/```json|```/g, '').trim();
+
+    let parsed;
+    try { parsed = JSON.parse(text); }
+    catch(e) {
+      // Tenta extrair JSON do texto se falhar
+      const match = text.match(/\{[\s\S]*\}/);
+      if (match) parsed = JSON.parse(match[0]);
+      else throw new Error('Resposta inesperada da IA');
+    }
+
+    pendingName = parsed.nome || 'objeto';
+    pendingTags = parsed.tags || [];
+    pendingDesc = parsed.descricao || '';
+
+    const tags = pendingTags.slice(0, 4).map(t =>
+      `<span class="tag">${t}</span>`
+    ).join('');
+
+    out.className = 'ai-out';
+    out.innerHTML = `
+      <div class="obj-name">${pendingName}</div>
+      ${tags ? `<div class="obj-tags">${tags}</div>` : ''}
+      ${pendingDesc ? `<div class="obj-desc">${pendingDesc}</div>` : ''}
+    `;
+    step(3);
+    toast('Objeto identificado!\nDiga onde vai guardar.', 'success');
+
+  } catch(e) {
+    out.className = 'ai-out';
+    out.style.color = 'var(--red-text)';
+    out.textContent = '⚠ ' + e.message;
+    pendingName = 'objeto'; pendingTags = []; pendingDesc = '';
+    step(3);
+  }
+}
+
+// ── Web Speech API ──
+function toggleVoice() {
+  if (isRec) { recog && recog.stop(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { toast('Reconhecimento de voz requer Chrome ou Edge.', 'error'); return; }
+  recog = new SR();
+  recog.lang = 'pt-BR'; recog.continuous = false;
+  recog.interimResults = true; recog.maxAlternatives = 3;
+
+  recog.onstart = () => {
+    isRec = true;
+    document.getElementById('btnVoice').className = 'btn rec';
+    document.getElementById('btnVoice').innerHTML = '<span class="dot"></span>Gravando...';
+    document.getElementById('voiceOut').className = 'voice-out';
+    document.getElementById('voiceOut').innerHTML = '<em style="color:var(--text3)">Fale o local agora...</em>';
+    voiceText = '';
+  };
+
+  recog.onresult = (e) => {
+    let interim = '', final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    if (final) voiceText = final.trim();
+    document.getElementById('voiceOut').className = 'voice-out';
+    document.getElementById('voiceOut').textContent = voiceText || interim || '...';
+  };
+
+  recog.onend = () => {
+    isRec = false;
+    document.getElementById('btnVoice').className = 'btn';
+    document.getElementById('btnVoice').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Falar local`;
+    if (voiceText) saveItem();
+    else {
+      document.getElementById('voiceOut').className = 'voice-out empty';
+      document.getElementById('voiceOut').textContent = 'Nada captado — tente novamente.';
+    }
+  };
+
+  recog.onerror = (e) => {
+    isRec = false;
+    document.getElementById('btnVoice').className = 'btn';
+    document.getElementById('btnVoice').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Falar local`;
+    const msgs = { 'no-speech':'Nada captado.', 'not-allowed':'Microfone negado.', 'network':'Erro de rede.' };
+    toast(msgs[e.error] || 'Erro: ' + e.error, 'error');
+  };
+
+  recog.start();
+}
+
+// ── Save ──
+function saveItem() {
+  if (!voiceText || !photoThumb) return;
+  const now = new Date();
+  const item = {
+    id: Date.now(),
+    name: pendingName || 'objeto',
+    tags: pendingTags || [],
+    desc: pendingDesc || '',
+    location: voiceText,
+    thumb: photoThumb,
+    time: now.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
+  };
+  items.unshift(item);
+  try { localStorage.setItem('ong_items', JSON.stringify(items)); } catch(e) {}
+  render();
+
+  photoData = null; photoThumb = null; voiceText = '';
+  pendingName = null; pendingTags = []; pendingDesc = '';
+  document.getElementById('voiceOut').className = 'voice-out empty';
+  document.getElementById('voiceOut').textContent = 'Aguardando gravação...';
+  document.getElementById('aiOut').className = 'ai-out';
+  document.getElementById('aiOut').style.color = 'var(--text3)';
+  document.getElementById('aiOut').textContent = 'Tire uma foto para identificar os objetos.';
+  document.getElementById('btnVoice').disabled = true;
+  step(4); setTimeout(() => step(1), 1800);
+  toast('✓ ' + item.name + '\nsalvo em "' + item.location + '"', 'success');
+}
+
+// ── Render ──
+function render() {
+  const q = (document.getElementById('search').value || '').toLowerCase().trim();
+  const filtered = items.filter(it =>
+    !q ||
+    it.name.toLowerCase().includes(q) ||
+    it.location.toLowerCase().includes(q) ||
+    (it.desc || '').toLowerCase().includes(q) ||
+    (it.tags || []).some(t => t.toLowerCase().includes(q))
+  );
+  document.getElementById('lcount').textContent = filtered.length + (filtered.length === 1 ? ' item' : ' itens');
+  const el = document.getElementById('items');
+  if (!filtered.length) {
+    el.innerHTML = items.length === 0
+      ? '<div class="empty">Nenhum objeto registrado ainda.<br>Tire uma foto e diga onde está guardando.</div>'
+      : `<div class="empty">Nenhum resultado para "${q}".</div>`;
+    return;
+  }
+  el.innerHTML = filtered.map(it => `
+    <div class="card">
+      <img class="thumb" src="${it.thumb}" alt="${it.name}" />
+      <div class="ci">
+        <div class="cn">${it.name}</div>
+        <div class="ctags">${(it.tags||[]).slice(0,4).map(t=>`<span class="ctag">${t}</span>`).join('')}</div>
+        <div class="cl">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          ${it.location}
+        </div>
+        <div class="ct">${it.time}</div>
+      </div>
+      <button class="del" onclick="delItem(${it.id})">✕</button>
+    </div>`).join('');
+}
+
+function delItem(id) {
+  items = items.filter(i => i.id !== id);
+  try { localStorage.setItem('ong_items', JSON.stringify(items)); } catch(e) {}
+  render(); toast('Item removido', 'warn');
+}
+
+// ── Toast ──
+let tt;
+function toast(msg, type='info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.background = type==='success'?'#14532d':type==='error'?'#7f1d1d':type==='warn'?'#78350f':'#1c1b18';
+  el.classList.add('show'); clearTimeout(tt);
+  tt = setTimeout(() => el.classList.remove('show'), 4000);
+}
+</script>
+</body>
+</html>
