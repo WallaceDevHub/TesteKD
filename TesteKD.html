@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onde Guardei? — Free</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f4f3ef;
+    --surface: #ffffff;
+    --surface2: #eceae4;
+    --border: rgba(0,0,0,0.09);
+    --border2: rgba(0,0,0,0.16);
+    --text: #1c1b18;
+    --text2: #6a6760;
+    --text3: #aaa89f;
+    --blue: #1a72f5;
+    --blue-bg: #e7f0fe;
+    --blue-text: #1348b0;
+    --green: #15a347;
+    --green-bg: #dbfce6;
+    --green-text: #14783a;
+    --red: #d92626;
+    --red-bg: #fde2e2;
+    --red-text: #b41c1c;
+    --amber-bg: #fef2c0;
+    --amber-text: #8a3d0c;
+    --radius: 10px;
+    --radius-lg: 14px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17171a;
+      --surface: #25252a;
+      --surface2: #1c1c20;
+      --border: rgba(255,255,255,0.09);
+      --border2: rgba(255,255,255,0.16);
+      --text: #f5f4f0;
+      --text2: #9e9c96;
+      --text3: #636059;
+      --blue-bg: #1b3868;
+      --blue-text: #90bcf8;
+      --green-bg: #113025;
+      --green-text: #7de8a0;
+      --red-bg: #3f0d0d;
+      --red-text: #f99;
+      --amber-bg: #3d1800;
+      --amber-text: #f8c84a;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem 1rem 4rem;
+  }
+
+  .app { width: 100%; max-width: 560px; }
+
+  /* ── Header ── */
+  .header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; }
+  .logo {
+    width: 44px; height: 44px; border-radius: 13px; background: var(--blue);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .header h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+  .header p { font-size: 12px; color: var(--text2); margin-top: 1px; }
+
+  /* ── Steps ── */
+  .steps { display: flex; margin-bottom: 1.25rem; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+  .step { flex: 1; padding: 9px 4px; text-align: center; font-size: 11px; font-weight: 600; color: var(--text3); background: var(--surface); border-right: 1px solid var(--border); transition: all .2s; }
+  .step:last-child { border-right: none; }
+  .step.active { background: var(--blue-bg); color: var(--blue-text); }
+  .step.done { background: var(--green-bg); color: var(--green-text); }
+
+  /* ── Banner ── */
+  .banner { border-radius: var(--radius); padding: 11px 14px; font-size: 12.5px; line-height: 1.6; margin-bottom: 1.1rem; }
+  .banner.info { background: var(--blue-bg); color: var(--blue-text); }
+  .banner.warn { background: var(--amber-bg); color: var(--amber-text); }
+  .banner.success { background: var(--green-bg); color: var(--green-text); }
+  .banner strong { font-weight: 700; }
+  .banner a { color: inherit; }
+
+  /* ── API key setup ── */
+  .setup-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 1.1rem 1.25rem; margin-bottom: 1.1rem;
+    box-shadow: var(--shadow);
+  }
+  .setup-card h3 { font-size: 13px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 7px; }
+  .setup-row { display: flex; gap: 8px; }
+  .setup-row input {
+    flex: 1; padding: 9px 12px; border-radius: var(--radius);
+    border: 1px solid var(--border2); background: var(--bg);
+    color: var(--text); font-size: 13px; outline: none; transition: border-color .15s;
+    font-family: 'Courier New', monospace;
+  }
+  .setup-row input:focus { border-color: var(--blue); }
+  .setup-row input::placeholder { font-family: -apple-system, sans-serif; color: var(--text3); }
+  .key-status { font-size: 12px; margin-top: 7px; color: var(--text2); }
+  .key-status.ok { color: var(--green-text); }
+  .key-status.err { color: var(--red-text); }
+
+  /* ── Camera ── */
+  .cam-box {
+    border-radius: var(--radius-lg); overflow: hidden;
+    border: 1px solid var(--border); background: var(--surface2);
+    aspect-ratio: 4/3; position: relative;
+    display: flex; align-items: center; justify-content: center; margin-bottom: .9rem;
+    box-shadow: var(--shadow);
+  }
+  #video { width: 100%; height: 100%; object-fit: cover; display: none; }
+  #canvas { display: none; }
+  .cam-ph { text-align: center; color: var(--text3); user-select: none; }
+  .cam-ph .icon { font-size: 52px; display: block; margin-bottom: 8px; }
+  .cam-ph p { font-size: 13px; }
+  .flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; transition: opacity .06s; border-radius: var(--radius-lg); }
+  .flash.on { opacity: .85; }
+
+  /* ── Buttons ── */
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: .9rem; }
+  .btn {
+    padding: 11px 6px; border-radius: var(--radius);
+    border: 1px solid var(--border2); background: var(--surface);
+    color: var(--text); font-size: 12px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px;
+    transition: background .14s, transform .1s; line-height: 1.3; box-shadow: var(--shadow);
+  }
+  .btn:hover:not(:disabled) { background: var(--surface2); }
+  .btn:active:not(:disabled) { transform: scale(0.97); }
+  .btn:disabled { opacity: .35; cursor: not-allowed; box-shadow: none; }
+  .btn.blue { background: var(--blue); color: #fff; border-color: transparent; }
+  .btn.blue:hover:not(:disabled) { background: #155ed6; }
+  .btn.rec { background: var(--red-bg); color: var(--red-text); border-color: transparent; animation: pulse 1.1s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.55} }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--red); animation: pulse 1s ease-in-out infinite; }
+
+  /* ── Panels ── */
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.125rem; margin-bottom: .9rem; box-shadow: var(--shadow); }
+  .plabel { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); margin-bottom: 7px; }
+
+  .voice-out { font-size: 15px; color: var(--text); min-height: 22px; line-height: 1.5; }
+  .voice-out.empty { color: var(--text3); font-style: italic; font-size: 14px; }
+
+  .ai-out { font-size: 14px; color: var(--text); line-height: 1.65; min-height: 36px; }
+  .ai-out.loading { color: var(--text2); display: flex; align-items: center; gap: 9px; }
+  .spinner { width: 15px; height: 15px; border: 2px solid var(--border2); border-top-color: var(--blue); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .tag { display: inline-flex; align-items: center; background: var(--blue-bg); color: var(--blue-text); font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 99px; margin: 0 4px 4px 0; }
+  .conf { font-size: 11px; opacity: .7; margin-left: 3px; }
+  .ai-desc { font-size: 13px; color: var(--text2); margin-top: 6px; }
+
+  /* ── Items list ── */
+  .lh { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
+  .lt { font-size: 14px; font-weight: 700; }
+  .lc { font-size: 12px; color: var(--text3); }
+  .search-wrap { position: relative; margin-bottom: 9px; }
+  .search-wrap svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text3); pointer-events: none; }
+  .search-wrap input {
+    width: 100%; padding: 9px 12px 9px 34px; border-radius: var(--radius);
+    border: 1px solid var(--border2); background: var(--surface); color: var(--text);
+    font-size: 13px; outline: none; transition: border-color .15s;
+  }
+  .search-wrap input:focus { border-color: var(--blue); }
+  .items { display: flex; flex-direction: column; gap: 8px; }
+  .empty { text-align: center; color: var(--text3); font-size: 13px; line-height: 1.6; padding: 2rem; background: var(--surface); border-radius: var(--radius-lg); border: 1px dashed var(--border2); }
+  .card {
+    display: flex; align-items: center; gap: 12px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 10px 12px; transition: border-color .15s; animation: in .22s ease;
+    box-shadow: var(--shadow);
+  }
+  @keyframes in { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:translateY(0)} }
+  .card:hover { border-color: var(--border2); }
+  .thumb { width: 54px; height: 54px; border-radius: 8px; object-fit: cover; flex-shrink: 0; border: 1px solid var(--border); background: var(--surface2); }
+  .ci { flex: 1; min-width: 0; }
+  .cn { font-size: 14px; font-weight: 700; }
+  .ctags { display: flex; flex-wrap: wrap; gap: 3px; margin: 3px 0; }
+  .ctag { font-size: 10px; background: var(--surface2); color: var(--text2); padding: 2px 7px; border-radius: 99px; border: 1px solid var(--border); }
+  .cl { font-size: 13px; color: var(--text2); display: flex; align-items: center; gap: 4px; }
+  .ct { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .del { background: none; border: 1px solid transparent; cursor: pointer; color: var(--text3); font-size: 15px; padding: 6px; border-radius: 6px; transition: all .13s; flex-shrink: 0; line-height: 1; }
+  .del:hover { color: var(--red); background: var(--red-bg); }
+
+  /* ── Toast ── */
+  #toast {
+    position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(70px);
+    background: var(--text); color: var(--bg); padding: 10px 20px;
+    border-radius: 99px; font-size: 13px; font-weight: 600;
+    transition: transform .24s ease, opacity .24s ease;
+    opacity: 0; white-space: nowrap; z-index: 999; pointer-events: none;
+    max-width: 90vw; text-align: center;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+<div id="toast"></div>
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Onde Guardei?</h1>
+      <p>Foto + voz · APIs gratuitas · salva no dispositivo</p>
+    </div>
+  </div>
+
+  <!-- Steps -->
+  <div class="steps">
+    <div class="step active" id="s1">1 · Câmera</div>
+    <div class="step" id="s2">2 · Foto</div>
+    <div class="step" id="s3">3 · Voz</div>
+    <div class="step" id="s4">✓ Salvo</div>
+  </div>
+
+  <!-- API Key Card -->
+  <div class="setup-card">
+    <h3>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Google Cloud Vision API — <span style="color:var(--green-text)">gratuita até 1.000 fotos/mês</span>
+    </h3>
+    <div class="setup-row">
+      <input type="password" id="apiKey" placeholder="Cole sua API key do Google Cloud aqui" autocomplete="off" />
+      <button class="btn blue" onclick="saveKey()">Salvar</button>
+    </div>
+    <div class="key-status" id="keyStatus">
+      Obtenha grátis em
+      <a href="https://console.cloud.google.com/apis/library/vision.googleapis.com" target="_blank">
+        console.cloud.google.com → Cloud Vision API → Ativar → Credenciais → Criar Chave de API
+      </a>
+    </div>
+  </div>
+
+  <!-- How it works banner -->
+  <div class="banner info" id="howBanner">
+    <strong>Como usar:</strong> Ligue a câmera → tire uma foto → clique em <strong>Falar local</strong> e diga onde vai guardar o objeto (ex: "gaveta da cozinha"). O registro fica salvo no seu dispositivo.
+  </div>
+
+  <!-- Camera -->
+  <div class="cam-box">
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas"></canvas>
+    <div class="cam-ph" id="camPh">
+      <span class="icon">📷</span>
+      <p>Câmera desligada</p>
+    </div>
+    <div class="flash" id="flash"></div>
+  </div>
+
+  <!-- Controls -->
+  <div class="btn-row">
+    <button class="btn" id="btnCam" onclick="toggleCamera()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      Ligar câmera
+    </button>
+    <button class="btn blue" id="btnSnap" onclick="takePhoto()" disabled>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M20.94 11A9 9 0 1 0 12 21"/></svg>
+      Tirar foto
+    </button>
+    <button class="btn" id="btnVoice" onclick="toggleVoice()" disabled>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      Falar local
+    </button>
+  </div>
+
+  <!-- Voice Panel -->
+  <div class="panel">
+    <div class="plabel">Você disse</div>
+    <div class="voice-out empty" id="voiceOut">Aguardando gravação...</div>
+  </div>
+
+  <!-- AI Panel -->
+  <div class="panel">
+    <div class="plabel">Objetos identificados — Google Vision AI</div>
+    <div class="ai-out" id="aiOut" style="color:var(--text3);font-size:14px">Tire uma foto para identificar os objetos.</div>
+  </div>
+
+  <!-- Items List -->
+  <div class="lh">
+    <span class="lt">Objetos registrados</span>
+    <span class="lc" id="lcount">0 itens</span>
+  </div>
+  <div class="search-wrap">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search" placeholder="Buscar por objeto ou local..." oninput="render()" />
+  </div>
+  <div class="items" id="items">
+    <div class="empty">Nenhum objeto registrado ainda.<br>Tire uma foto e diga onde está guardando.</div>
+  </div>
+
+</div>
+<script>
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+let stream = null, cameraOn = false;
+let photoData = null, photoThumb = null;
+let pendingLabels = null, pendingMain = null;
+let voiceText = '', isRec = false, recog = null;
+let items = JSON.parse(localStorage.getItem('ong_items') || '[]');
+let apiKey = localStorage.getItem('ong_key') || '';
+
+if (apiKey) {
+  document.getElementById('keyStatus').className = 'key-status ok';
+  document.getElementById('keyStatus').textContent = '✓ API key salva. Pronta para usar.';
+}
+render();
+
+// ═══════════════════════════════════════════════════
+//  API KEY
+// ═══════════════════════════════════════════════════
+function saveKey() {
+  const v = document.getElementById('apiKey').value.trim();
+  if (!v) { toast('Cole a API key primeiro', 'warn'); return; }
+  apiKey = v;
+  localStorage.setItem('ong_key', v);
+  document.getElementById('apiKey').value = '';
+  document.getElementById('apiKey').placeholder = 'API key salva ✓';
+  document.getElementById('keyStatus').className = 'key-status ok';
+  document.getElementById('keyStatus').textContent = '✓ API key salva com sucesso!';
+  document.getElementById('howBanner').style.display = 'none';
+  toast('API key salva!', 'success');
+}
+
+// ═══════════════════════════════════════════════════
+//  STEPS
+// ═══════════════════════════════════════════════════
+function step(n) {
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById('s'+i).className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  CAMERA
+// ═══════════════════════════════════════════════════
+async function toggleCamera() {
+  if (cameraOn) { stopCam(); return; }
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 } },
+      audio: false
+    });
+    const v = document.getElementById('video');
+    v.srcObject = stream;
+    v.style.display = 'block';
+    document.getElementById('camPh').style.display = 'none';
+    cameraOn = true;
+    document.getElementById('btnCam').innerHTML = icon('x-cam') + ' Desligar';
+    document.getElementById('btnSnap').disabled = false;
+    step(1);
+  } catch(e) {
+    const msg = e.name === 'NotAllowedError'
+      ? 'Permissão negada — clique no cadeado na barra de endereço e permita a câmera.'
+      : 'Erro ao acessar câmera: ' + e.message;
+    toast(msg, 'error');
+  }
+}
+
+function stopCam() {
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  document.getElementById('video').style.display = 'none';
+  document.getElementById('camPh').style.display = 'flex';
+  cameraOn = false; stream = null;
+  document.getElementById('btnCam').innerHTML = icon('cam') + ' Ligar câmera';
+  document.getElementById('btnSnap').disabled = true;
+}
+
+// ═══════════════════════════════════════════════════
+//  TAKE PHOTO
+// ═══════════════════════════════════════════════════
+function takePhoto() {
+  const v = document.getElementById('video');
+  const c = document.getElementById('canvas');
+  c.width = v.videoWidth || 1280;
+  c.height = v.videoHeight || 960;
+  c.getContext('2d').drawImage(v, 0, 0);
+
+  // flash
+  const fl = document.getElementById('flash');
+  fl.classList.add('on');
+  setTimeout(() => fl.classList.remove('on'), 160);
+
+  // full res for API, small thumb for display
+  photoData = c.toDataURL('image/jpeg', 0.85).split(',')[1];
+
+  // downsample thumb
+  const tc = document.createElement('canvas');
+  tc.width = 120; tc.height = 90;
+  tc.getContext('2d').drawImage(c, 0, 0, 120, 90);
+  photoThumb = tc.toDataURL('image/jpeg', 0.7);
+
+  pendingLabels = null; pendingMain = null; voiceText = '';
+  document.getElementById('voiceOut').className = 'voice-out empty';
+  document.getElementById('voiceOut').textContent = 'Aguardando gravação...';
+  document.getElementById('btnVoice').disabled = false;
+  step(2);
+  analyzeImage();
+}
+
+// ═══════════════════════════════════════════════════
+//  GOOGLE CLOUD VISION API  (free tier: 1000/month)
+//  Endpoint: POST https://vision.googleapis.com/v1/images:annotate?key=KEY
+//  Features used: LABEL_DETECTION (free), OBJECT_LOCALIZATION (free)
+// ═══════════════════════════════════════════════════
+async function analyzeImage() {
+  const out = document.getElementById('aiOut');
+  out.className = 'ai-out loading';
+  out.innerHTML = '<div class="spinner"></div> Identificando com Google Vision...';
+
+  if (!apiKey) {
+    out.className = 'ai-out';
+    out.style.color = 'var(--text3)';
+    out.textContent = 'Insira sua Google Cloud Vision API key para identificar objetos automaticamente.';
+    pendingLabels = ['objeto']; pendingMain = 'objeto';
+    step(3);
+    return;
+  }
+
+  try {
+    const body = {
+      requests: [{
+        image: { content: photoData },
+        features: [
+          { type: 'LABEL_DETECTION', maxResults: 8 },
+          { type: 'OBJECT_LOCALIZATION', maxResults: 5 }
+        ]
+      }]
+    };
+
+    const res = await fetch(
+      `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`,
+      { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+    );
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    const r = data.responses?.[0];
+
+    // Combine object localization (higher precision) + labels
+    const objects = (r.localizedObjectAnnotations || []).map(o => ({
+      name: translateLabel(o.name),
+      score: o.score,
+      source: 'obj'
+    }));
+    const labels = (r.labelAnnotations || []).map(l => ({
+      name: translateLabel(l.description),
+      score: l.score,
+      source: 'lbl'
+    }));
+
+    // Merge: prefer object detections, fill with labels
+    const seen = new Set();
+    const all = [];
+    for (const item of [...objects, ...labels]) {
+      const key = item.name.toLowerCase();
+      if (!seen.has(key)) { seen.add(key); all.push(item); }
+      if (all.length >= 6) break;
+    }
+
+    if (!all.length) throw new Error('Nenhum objeto identificado na imagem.');
+
+    pendingMain = all[0].name;
+    pendingLabels = all.map(i => i.name);
+
+    const tags = all.slice(0, 5).map(i =>
+      `<span class="tag">${i.name}<span class="conf">${Math.round(i.score * 100)}%</span></span>`
+    ).join('');
+
+    out.className = 'ai-out';
+    out.innerHTML = `<div style="margin-bottom:5px">${tags}</div><div class="ai-desc">Principal: <strong>${pendingMain}</strong></div>`;
+    step(3);
+    toast('Objeto identificado! Agora diga onde vai guardar.', 'success');
+
+  } catch(e) {
+    out.className = 'ai-out';
+    out.style.color = 'var(--red-text)';
+    out.textContent = '⚠ ' + e.message;
+    pendingLabels = ['objeto']; pendingMain = 'objeto';
+    step(3);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  LABEL TRANSLATION  (EN → PT-BR)
+//  Google Vision returns labels in English
+// ═══════════════════════════════════════════════════
+const TR = {
+  // electronics
+  'laptop':'notebook','computer':'computador','keyboard':'teclado','mouse':'mouse',
+  'monitor':'monitor','phone':'celular','mobile phone':'celular','smartphone':'celular',
+  'tablet':'tablet','camera':'câmera','headphones':'fone de ouvido','television':'televisão',
+  'remote control':'controle remoto','charger':'carregador','cable':'cabo',
+  // home
+  'chair':'cadeira','table':'mesa','desk':'escrivaninha','sofa':'sofá','bed':'cama',
+  'lamp':'luminária','book':'livro','bag':'bolsa','backpack':'mochila','wallet':'carteira',
+  'umbrella':'guarda-chuva','glasses':'óculos','watch':'relógio','keys':'chaves','key':'chave',
+  'bottle':'garrafa','cup':'xícara','mug':'caneca','plate':'prato','fork':'garfo','knife':'faca',
+  'spoon':'colher','scissors':'tesoura','pen':'caneta','pencil':'lápis','notebook':'caderno',
+  // clothes
+  'shoe':'sapato','shoes':'sapatos','sneakers':'tênis','shirt':'camisa','pants':'calça',
+  'jacket':'jaqueta','coat':'casaco','hat':'chapéu','cap':'boné','sock':'meia',
+  // tools
+  'tool':'ferramenta','screwdriver':'chave de fenda','hammer':'martelo','drill':'furadeira',
+  'tape':'fita','box':'caixa','container':'pote',
+  // food
+  'food':'alimento','fruit':'fruta','vegetable':'vegetal',
+  // generic
+  'object':'objeto','item':'item','product':'produto','device':'dispositivo',
+  'technology':'tecnologia','electronic device':'dispositivo eletrônico',
+  'personal computer':'computador','home appliance':'eletrodoméstico',
+};
+
+function translateLabel(label) {
+  const l = label.toLowerCase();
+  if (TR[l]) return TR[l];
+  // partial match
+  for (const [en, pt] of Object.entries(TR)) {
+    if (l.includes(en) && en.length > 3) return pt;
+  }
+  return label; // keep original if no translation
+}
+
+// ═══════════════════════════════════════════════════
+//  WEB SPEECH API  — 100% free, no key needed
+//  Works on Chrome, Edge, Safari (desktop/mobile)
+// ═══════════════════════════════════════════════════
+function toggleVoice() {
+  if (isRec) { recog && recog.stop(); return; }
+
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    toast('Reconhecimento de voz requer Google Chrome ou Edge.', 'error');
+    return;
+  }
+
+  recog = new SR();
+  recog.lang = 'pt-BR';
+  recog.continuous = false;
+  recog.interimResults = true;
+  recog.maxAlternatives = 3;
+
+  recog.onstart = () => {
+    isRec = true;
+    document.getElementById('btnVoice').className = 'btn rec';
+    document.getElementById('btnVoice').innerHTML = '<span class="dot"></span> Gravando...';
+    document.getElementById('voiceOut').className = 'voice-out';
+    document.getElementById('voiceOut').innerHTML = '<em style="color:var(--text3)">Fale agora — diga onde vai guardar...</em>';
+    voiceText = '';
+  };
+
+  recog.onresult = (e) => {
+    let interim = '', final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    if (final) voiceText = final.trim();
+    document.getElementById('voiceOut').className = 'voice-out';
+    document.getElementById('voiceOut').textContent = voiceText || interim || '...';
+  };
+
+  recog.onend = () => {
+    isRec = false;
+    document.getElementById('btnVoice').className = 'btn';
+    document.getElementById('btnVoice').innerHTML = icon('mic') + ' Falar local';
+    if (voiceText) saveItem();
+    else {
+      document.getElementById('voiceOut').className = 'voice-out empty';
+      document.getElementById('voiceOut').textContent = 'Nada captado — tente novamente.';
+    }
+  };
+
+  recog.onerror = (e) => {
+    isRec = false;
+    document.getElementById('btnVoice').className = 'btn';
+    document.getElementById('btnVoice').innerHTML = icon('mic') + ' Falar local';
+    const msgs = {
+      'no-speech':'Nenhum som detectado. Tente falar mais perto do microfone.',
+      'not-allowed':'Permissão de microfone negada.',
+      'network':'Erro de rede ao processar voz.'
+    };
+    toast(msgs[e.error] || 'Erro de voz: ' + e.error, 'error');
+  };
+
+  recog.start();
+}
+
+// ═══════════════════════════════════════════════════
+//  SAVE ITEM
+// ═══════════════════════════════════════════════════
+function saveItem() {
+  if (!voiceText || !photoThumb) return;
+  const now = new Date();
+  const item = {
+    id: Date.now(),
+    name: pendingMain || 'objeto',
+    labels: pendingLabels || [],
+    location: voiceText,
+    thumb: photoThumb,
+    time: now.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
+  };
+  items.unshift(item);
+  try { localStorage.setItem('ong_items', JSON.stringify(items)); } catch(e) {}
+  render();
+
+  // reset
+  photoData = null; photoThumb = null; voiceText = '';
+  pendingLabels = null; pendingMain = null;
+  document.getElementById('voiceOut').className = 'voice-out empty';
+  document.getElementById('voiceOut').textContent = 'Aguardando gravação...';
+  document.getElementById('aiOut').className = 'ai-out';
+  document.getElementById('aiOut').style.color = 'var(--text3)';
+  document.getElementById('aiOut').textContent = 'Tire uma foto para identificar os objetos.';
+  document.getElementById('btnVoice').disabled = true;
+
+  step(4);
+  setTimeout(() => step(1), 1800);
+  toast('✓ ' + item.name + ' salvo em "' + item.location + '"', 'success');
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER LIST
+// ═══════════════════════════════════════════════════
+function render() {
+  const q = (document.getElementById('search').value || '').toLowerCase().trim();
+  const filtered = items.filter(it =>
+    !q || it.name.toLowerCase().includes(q) ||
+    it.location.toLowerCase().includes(q) ||
+    (it.labels || []).some(l => l.toLowerCase().includes(q))
+  );
+  document.getElementById('lcount').textContent = filtered.length + (filtered.length === 1 ? ' item' : ' itens');
+  const el = document.getElementById('items');
+  if (!filtered.length) {
+    el.innerHTML = items.length === 0
+      ? '<div class="empty">Nenhum objeto registrado ainda.<br>Tire uma foto e diga onde está guardando.</div>'
+      : `<div class="empty">Nenhum resultado para "${q}".</div>`;
+    return;
+  }
+  el.innerHTML = filtered.map(it => `
+    <div class="card">
+      <img class="thumb" src="${it.thumb}" alt="${it.name}" />
+      <div class="ci">
+        <div class="cn">${it.name}</div>
+        <div class="ctags">${(it.labels||[]).filter(l=>l!==it.name).slice(0,4).map(l=>`<span class="ctag">${l}</span>`).join('')}</div>
+        <div class="cl"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> ${it.location}</div>
+        <div class="ct">${it.time}</div>
+      </div>
+      <button class="del" onclick="del(${it.id})" title="Remover">✕</button>
+    </div>
+  `).join('');
+}
+
+function del(id) {
+  items = items.filter(i => i.id !== id);
+  try { localStorage.setItem('ong_items', JSON.stringify(items)); } catch(e) {}
+  render(); toast('Item removido', 'warn');
+}
+
+// ═══════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════
+let tt;
+function toast(msg, type='info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.background = type==='success'?'#14532d':type==='error'?'#7f1d1d':type==='warn'?'#78350f':'#1c1b18';
+  el.classList.add('show');
+  clearTimeout(tt);
+  tt = setTimeout(() => el.classList.remove('show'), 3800);
+}
+
+// ═══════════════════════════════════════════════════
+//  ICON HELPERS
+// ═══════════════════════════════════════════════════
+function icon(t) {
+  const icons = {
+    cam: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>`,
+    'x-cam': `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"/><path d="M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34"/></svg>`,
+    mic: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>`,
+  };
+  return icons[t] || '';
+}
+</script>
+</body>
+</html>
