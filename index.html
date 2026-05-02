@@ -386,9 +386,9 @@ async function analyzeImage() {
 
     const data = await res.json();
 
-    // Trata resposta de modelo em cold start
-    if (data?.error?.includes('loading')) {
-      out.innerHTML = '<div class="spinner"></div> Modelo iniciando (aguarde ~20s)...';
+    // Modelo ainda carregando (cold start)
+    if (data?.loading) {
+      out.innerHTML = '<div class="spinner"></div> Modelo iniciando, aguarde ~20s...';
       await new Promise(r => setTimeout(r, 12000));
       const res2 = await fetch(workerUrl, {
         method: 'POST',
@@ -396,10 +396,14 @@ async function analyzeImage() {
         body: JSON.stringify({ token: hfKey, imageBase64: photoData })
       });
       const data2 = await res2.json();
-      return processResult(data2, out);
+      return processResult(data2.success ? data2.results : data2, out);
     }
 
-    processResult(data, out);
+    if (data?.error) throw new Error(data.error);
+
+    // Novo formato: { success: true, results: [...], model: '...' }
+    const results = data?.success ? data.results : data;
+    processResult(results, out);
 
   } catch(e) {
     out.className = 'ai-out';
