@@ -16,7 +16,6 @@
     --blue: #1a72f5; --blue-bg: #e7f0fe; --blue-text: #1348b0;
     --green: #15a347; --green-bg: #dbfce6; --green-text: #14783a;
     --red: #d92626; --red-bg: #fde2e2; --red-text: #b41c1c;
-    --amber-bg: #fef2c0; --amber-text: #8a3d0c;
     --radius: 10px; --radius-lg: 14px;
   }
   @media (prefers-color-scheme: dark) {
@@ -27,7 +26,6 @@
       --blue-bg: #1b3868; --blue-text: #90bcf8;
       --green-bg: #113025; --green-text: #7de8a0;
       --red-bg: #3f0d0d; --red-text: #f99;
-      --amber-bg: #3d1800; --amber-text: #f8c84a;
     }
   }
   body {
@@ -51,24 +49,24 @@
   .step.done { background: var(--green-bg); color: var(--green-text); }
 
   .setup-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.125rem; margin-bottom: 1rem; }
-  .setup-card h3 { font-size: 13px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 7px; }
-  .setup-card .sub { font-size: 12px; color: var(--text2); margin-bottom: 9px; line-height: 1.6; }
+  .setup-card h3 { font-size: 13px; font-weight: 700; margin-bottom: 5px; display: flex; align-items: center; gap: 7px; }
+  .setup-card .sub { font-size: 12px; color: var(--text2); margin-bottom: 10px; line-height: 1.65; }
   .setup-card .sub a { color: var(--blue-text); }
-  .field-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 5px; margin-top: 10px; }
   .setup-row { display: flex; gap: 8px; }
-  .setup-row input, .full-input {
-    flex: 1; width: 100%; padding: 10px 12px; border-radius: var(--radius);
+  .setup-row input {
+    flex: 1; padding: 10px 12px; border-radius: var(--radius);
     border: 1px solid var(--border2); background: var(--bg);
     color: var(--text); font-size: 13px; outline: none;
     -webkit-appearance: none; font-family: monospace;
   }
-  .setup-row input:focus, .full-input:focus { border-color: var(--blue); }
-  .setup-row input::placeholder, .full-input::placeholder { font-family: -apple-system, sans-serif; color: var(--text3); }
-  .save-btn { margin-top: 10px; width: 100%; padding: 11px; border-radius: var(--radius); border: none; background: var(--blue); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+  .setup-row input:focus { border-color: var(--blue); }
+  .setup-row input::placeholder { font-family: -apple-system, sans-serif; color: var(--text3); font-size: 13px; }
+  .save-btn { margin-top: 10px; width: 100%; padding: 12px; border-radius: var(--radius); border: none; background: var(--blue); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
   .save-btn:active { opacity: .8; }
-  .key-status { font-size: 12px; margin-top: 7px; color: var(--text2); }
+  .key-status { font-size: 12px; margin-top: 7px; }
   .key-status.ok { color: var(--green-text); font-weight: 600; }
   .key-status.err { color: var(--red-text); }
+  .key-status.info { color: var(--text2); }
 
   .cam-box { border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border); background: #111; aspect-ratio: 4/3; position: relative; display: flex; align-items: center; justify-content: center; margin-bottom: .9rem; width: 100%; }
   #video { width: 100%; height: 100%; object-fit: cover; display: none; }
@@ -96,13 +94,15 @@
   .plabel { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); margin-bottom: 7px; }
   .voice-out { font-size: 16px; color: var(--text); min-height: 24px; line-height: 1.5; }
   .voice-out.empty { color: var(--text3); font-style: italic; font-size: 14px; }
+
   .ai-out { font-size: 14px; color: var(--text); line-height: 1.65; min-height: 36px; }
   .ai-out.loading { color: var(--text2); display: flex; align-items: center; gap: 9px; }
   .spinner { width: 15px; height: 15px; border: 2px solid var(--border2); border-top-color: var(--blue); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .tag { display: inline-flex; align-items: center; background: var(--blue-bg); color: var(--blue-text); font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 99px; margin: 0 4px 4px 0; }
-  .conf { font-size: 11px; opacity: .7; margin-left: 3px; }
-  .ai-desc { font-size: 13px; color: var(--text2); margin-top: 6px; }
+  .obj-name { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .obj-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+  .tag { display: inline-flex; align-items: center; background: var(--blue-bg); color: var(--blue-text); font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 99px; }
+  .obj-desc { font-size: 13px; color: var(--text2); line-height: 1.55; }
 
   .lh { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
   .lt { font-size: 14px; font-weight: 700; }
@@ -119,7 +119,7 @@
   .cn { font-size: 15px; font-weight: 700; }
   .ctags { display: flex; flex-wrap: wrap; gap: 3px; margin: 3px 0; }
   .ctag { font-size: 10px; background: var(--surface2); color: var(--text2); padding: 2px 7px; border-radius: 99px; border: 1px solid var(--border); }
-  .cl { font-size: 13px; color: var(--text2); display: flex; align-items: center; gap: 4px; margin-top: 1px; }
+  .cl { font-size: 13px; color: var(--text2); display: flex; align-items: center; gap: 4px; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .ct { font-size: 11px; color: var(--text3); margin-top: 2px; }
   .del { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 18px; padding: 8px; border-radius: 6px; flex-shrink: 0; line-height: 1; touch-action: manipulation; }
   .del:active { color: var(--red); }
@@ -140,7 +140,7 @@
     </div>
     <div>
       <h1>Onde Guardei?</h1>
-      <p>Foto + voz · Hugging Face · 100% grátis</p>
+      <p>Foto + voz · Gemini Vision · 100% grátis</p>
     </div>
   </div>
 
@@ -154,24 +154,19 @@
   <!-- Setup -->
   <div class="setup-card">
     <h3>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      Configuração — ambos gratuitos
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Google Gemini Vision — <span style="color:var(--green-text)">1.500 req/dia grátis</span>
     </h3>
     <div class="sub">
-      <strong>Token Hugging Face:</strong> <a href="https://huggingface.co/settings/tokens" target="_blank">huggingface.co</a> → Settings → Access Tokens → New token (Read)<br>
-      <strong>URL do Worker:</strong> <a href="https://workers.cloudflare.com" target="_blank">workers.cloudflare.com</a> → cole o código do proxy e faça deploy
+      1. Acesse <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a><br>
+      2. Clique em <strong>Get API key</strong> → <strong>Create API key</strong><br>
+      3. Cole a key abaixo (começa com <code>AIza...</code>)
     </div>
-
-    <div class="field-label">Token Hugging Face (hf_...)</div>
     <div class="setup-row">
-      <input type="password" id="hfKey" placeholder="hf_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
+      <input type="password" id="apiKey" placeholder="AIzaSy..." autocomplete="off" />
+      <button class="save-btn" style="margin:0;width:auto;padding:10px 16px;font-size:13px" onclick="saveKey()">Salvar</button>
     </div>
-
-    <div class="field-label">URL do Cloudflare Worker</div>
-    <input class="full-input" type="url" id="workerUrl" placeholder="https://meu-worker.usuario.workers.dev" autocomplete="off" />
-
-    <button class="save-btn" onclick="saveConfig()">Salvar configuração</button>
-    <div class="key-status" id="keyStatus">Preencha os dois campos acima para começar.</div>
+    <div class="key-status info" id="keyStatus">Aguardando API key do Google AI Studio...</div>
   </div>
 
   <!-- Camera -->
@@ -212,7 +207,7 @@
   </div>
 
   <div class="panel">
-    <div class="plabel">Objetos identificados — Hugging Face AI</div>
+    <div class="plabel">Análise do Gemini Vision</div>
     <div class="ai-out" id="aiOut" style="color:var(--text3);font-size:14px">Tire uma foto para identificar os objetos.</div>
   </div>
 
@@ -233,44 +228,32 @@
 // ── State ──
 let stream = null, cameraOn = false;
 let photoData = null, photoThumb = null;
-let pendingLabels = null, pendingMain = null;
+let pendingName = null, pendingTags = [], pendingDesc = '';
 let voiceText = '', isRec = false, recog = null;
 let items = [];
-let hfKey = '', workerUrl = '';
+let apiKey = '';
 
 try { items = JSON.parse(localStorage.getItem('ong_items') || '[]'); } catch(e) {}
-try { hfKey = localStorage.getItem('ong_hf') || ''; } catch(e) {}
-try { workerUrl = localStorage.getItem('ong_worker') || ''; } catch(e) {}
+try { apiKey = localStorage.getItem('ong_gemini_key') || ''; } catch(e) {}
 
-if (hfKey && workerUrl) {
+if (apiKey) {
   document.getElementById('keyStatus').className = 'key-status ok';
-  document.getElementById('keyStatus').textContent = '✓ Configuração salva e pronta!';
+  document.getElementById('keyStatus').textContent = '✓ API key salva e pronta!';
 }
 render();
 
-// ── Config ──
-function saveConfig() {
-  const hf = document.getElementById('hfKey').value.trim();
-  const wu = document.getElementById('workerUrl').value.trim();
-
-  const errs = [];
-  if (hf && !hf.startsWith('hf_')) errs.push('Token HF deve começar com hf_');
-  if (wu && !wu.startsWith('https://')) errs.push('URL do Worker deve começar com https://');
-
-  if (errs.length) { toast(errs.join('\n'), 'error'); return; }
-
-  if (hf) { hfKey = hf; try { localStorage.setItem('ong_hf', hf); } catch(e) {} }
-  if (wu) { workerUrl = wu.replace(/\/$/, ''); try { localStorage.setItem('ong_worker', workerUrl); } catch(e) {} }
-
-  document.getElementById('hfKey').value = '';
-  document.getElementById('workerUrl').value = '';
-
-  const ok = hfKey && workerUrl;
-  document.getElementById('keyStatus').className = ok ? 'key-status ok' : 'key-status';
-  document.getElementById('keyStatus').textContent = ok
-    ? '✓ Tudo configurado! Pode tirar fotos.'
-    : 'Falta: ' + (!hfKey ? 'token HF ' : '') + (!workerUrl ? 'URL do Worker' : '');
-  if (ok) toast('✓ Configuração salva!', 'success');
+// ── API Key ──
+function saveKey() {
+  const v = document.getElementById('apiKey').value.trim();
+  if (!v) { toast('Cole a API key primeiro', 'warn'); return; }
+  if (!v.startsWith('AIza')) { toast('Key inválida — deve começar com AIza', 'error'); return; }
+  apiKey = v;
+  try { localStorage.setItem('ong_gemini_key', v); } catch(e) {}
+  document.getElementById('apiKey').value = '';
+  document.getElementById('apiKey').placeholder = 'API key salva ✓';
+  document.getElementById('keyStatus').className = 'key-status ok';
+  document.getElementById('keyStatus').textContent = '✓ API key salva! Pode tirar fotos.';
+  toast('✓ API key salva!', 'success');
 }
 
 // ── Steps ──
@@ -346,7 +329,7 @@ function processCanvas(c) {
   tc.getContext('2d').drawImage(c, 0, 0, 120, 90);
   photoThumb = tc.toDataURL('image/jpeg', 0.7);
   photoData = c.toDataURL('image/jpeg', 0.85).split(',')[1];
-  pendingLabels = null; pendingMain = null; voiceText = '';
+  pendingName = null; pendingTags = []; pendingDesc = ''; voiceText = '';
   document.getElementById('voiceOut').className = 'voice-out empty';
   document.getElementById('voiceOut').textContent = 'Aguardando gravação...';
   document.getElementById('btnVoice').disabled = false;
@@ -354,299 +337,31 @@ function processCanvas(c) {
   analyzeImage();
 }
 
-// ═══════════════════════════════════════════════════
-//  ANÁLISE VIA CLOUDFLARE WORKER → HUGGING FACE
-//  Worker resolve o CORS e repassa ao HF
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+//  GOOGLE GEMINI VISION API
+//  Modelo: gemini-2.0-flash (rápido e preciso)
+//  Endpoint: generativelanguage.googleapis.com
+//  Free tier: 1.500 req/dia — sem cartão — sem CORS
+//  Responde em português diretamente!
+// ═══════════════════════════════════════════════════════════
 async function analyzeImage() {
   const out = document.getElementById('aiOut');
-
-  if (!hfKey || !workerUrl) {
-    out.className = 'ai-out';
-    out.style.color = 'var(--text3)';
-    out.textContent = 'Configure o token e a URL do Worker acima para ativar a IA.';
-    pendingLabels = ['objeto']; pendingMain = 'objeto';
-    step(3); return;
-  }
-
   out.className = 'ai-out loading';
-  out.innerHTML = '<div class="spinner"></div> Identificando objetos...';
+  out.innerHTML = '<div class="spinner"></div> Analisando com Gemini...';
 
-  try {
-    const res = await fetch(workerUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: hfKey, imageBase64: photoData })
-    });
-
-    if (!res.ok) {
-      const e = await res.json().catch(() => ({}));
-      throw new Error(e?.error || `HTTP ${res.status}`);
-    }
-
-    const data = await res.json();
-
-    // Modelo ainda carregando (cold start)
-    if (data?.loading) {
-      out.innerHTML = '<div class="spinner"></div> Modelo iniciando, aguarde ~20s...';
-      await new Promise(r => setTimeout(r, 12000));
-      const res2 = await fetch(workerUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: hfKey, imageBase64: photoData })
-      });
-      const data2 = await res2.json();
-      return processResult(data2.success ? data2.results : data2, out);
-    }
-
-    if (data?.error) throw new Error(data.error);
-
-    // Novo formato: { success: true, results: [...], model: '...' }
-    const results = data?.success ? data.results : data;
-    processResult(results, out);
-
-  } catch(e) {
-    out.className = 'ai-out';
-    out.style.color = 'var(--red-text)';
-    out.textContent = '⚠ ' + e.message;
-    pendingLabels = ['objeto']; pendingMain = 'objeto';
-    step(3);
-  }
-}
-
-function processResult(data, out) {
-  let labels = [];
-
-  if (Array.isArray(data)) {
-    // DETR: [{label, score, box}] ou ViT: [{label, score}]
-    const seen = new Set();
-    for (const d of data) {
-      if (d.score < 0.3) continue;
-      const name = tr(d.label);
-      if (!seen.has(name)) { seen.add(name); labels.push({ name, score: d.score }); }
-      if (labels.length >= 6) break;
-    }
-  }
-
-  if (!labels.length) {
+  if (!apiKey) {
     out.className = 'ai-out';
     out.style.color = 'var(--text3)';
-    out.textContent = 'Nenhum objeto identificado. Tente uma foto mais nítida.';
-    pendingLabels = ['objeto']; pendingMain = 'objeto';
+    out.textContent = 'Adicione sua API key do Google AI Studio para identificar objetos.';
+    pendingName = 'objeto'; pendingTags = []; pendingDesc = '';
     step(3); return;
   }
 
-  pendingMain = labels[0].name;
-  pendingLabels = labels.map(l => l.name);
-
-  const tags = labels.slice(0, 5).map(l =>
-    `<span class="tag">${l.name}<span class="conf">${Math.round(l.score * 100)}%</span></span>`
-  ).join('');
-
-  out.className = 'ai-out';
-  out.innerHTML = `<div style="margin-bottom:5px">${tags}</div><div class="ai-desc">Principal: <strong>${pendingMain}</strong></div>`;
-  step(3);
-  toast('Objeto identificado!\nAgora diga onde vai guardar.', 'success');
+  const prompt = `Analise esta imagem e identifique o(s) objeto(s) principal(is).
+Responda APENAS com JSON válido, sem markdown, sem explicações:
+{
+  "nome": "nome principal do objeto em português",
+  "tags": ["tag1", "tag2", "tag3"],
+  "descricao": "descrição curta e específica em português, ex: notebook Dell preto sobre mesa"
 }
-
-// ── Tradução EN→PT (dicionário expandido) ──
-const T = {
-  'laptop':'notebook','laptop computer':'notebook','notebook computer':'notebook',
-  'computer':'computador','desktop computer':'computador desktop','computer keyboard':'teclado',
-  'keyboard':'teclado','computer mouse':'mouse','mouse':'mouse','monitor':'monitor',
-  'computer monitor':'monitor','screen':'tela','cell phone':'celular','mobile phone':'celular',
-  'phone':'celular','smartphone':'celular','tablet':'tablet','tablet computer':'tablet',
-  'camera':'câmera','digital camera':'câmera digital','video camera':'câmera de vídeo',
-  'headphones':'fone de ouvido','earphones':'fone de ouvido','earbuds':'fone sem fio',
-  'headset':'headset','speaker':'caixa de som','bluetooth speaker':'caixa bluetooth',
-  'television':'televisão','tv':'televisão','flat screen tv':'TV de tela plana',
-  'remote control':'controle remoto','remote':'controle remoto',
-  'game controller':'controle de videogame','joystick':'joystick',
-  'charger':'carregador','power bank':'carregador portátil','cable':'cabo',
-  'usb cable':'cabo USB','hdmi cable':'cabo HDMI','adapter':'adaptador',
-  'router':'roteador','modem':'modem','printer':'impressora','scanner':'scanner',
-  'projector':'projetor','hard drive':'HD externo','usb drive':'pen drive',
-  'flash drive':'pen drive','memory card':'cartão de memória','battery':'bateria',
-  'power strip':'extensão elétrica','calculator':'calculadora','alarm clock':'despertador',
-  'smart watch':'smartwatch','smartwatch':'smartwatch',
-  'chair':'cadeira','armchair':'poltrona','office chair':'cadeira de escritório',
-  'table':'mesa','dining table':'mesa de jantar','coffee table':'mesa de centro',
-  'desk':'escrivaninha','bookshelf':'estante','bookcase':'estante de livros',
-  'shelf':'prateleira','cabinet':'armário','wardrobe':'guarda-roupa','closet':'armário',
-  'drawer':'gaveta','dresser':'cômoda','nightstand':'criado-mudo','bed':'cama',
-  'sofa':'sofá','couch':'sofá','ottoman':'puff','bench':'banco','stool':'banquinho',
-  'lamp':'luminária','floor lamp':'abajur de chão','table lamp':'abajur',
-  'ceiling light':'lustre','chandelier':'lustre','fan':'ventilador',
-  'air conditioner':'ar-condicionado','heater':'aquecedor','mirror':'espelho',
-  'picture frame':'porta-retrato','painting':'quadro','clock':'relógio de parede',
-  'wall clock':'relógio de parede','curtain':'cortina','rug':'tapete','carpet':'tapete',
-  'pillow':'travesseiro','cushion':'almofada','blanket':'cobertor','towel':'toalha',
-  'laundry basket':'cesto de roupa','trash can':'lixeira',
-  'vacuum cleaner':'aspirador de pó','iron':'ferro de passar',
-  'washing machine':'máquina de lavar','refrigerator':'geladeira','fridge':'geladeira',
-  'microwave':'micro-ondas','oven':'forno','stove':'fogão','blender':'liquidificador',
-  'toaster':'torradeira','kettle':'chaleira','coffee maker':'cafeteira',
-  'shoe':'sapato','shoes':'sapatos','sneaker':'tênis','sneakers':'tênis',
-  'boot':'bota','boots':'botas','sandal':'sandália','sandals':'sandálias',
-  'slipper':'chinelo','high heel':'salto alto','shirt':'camisa','t-shirt':'camiseta',
-  'blouse':'blusa','pants':'calça','jeans':'jeans','shorts':'shorts','skirt':'saia',
-  'dress':'vestido','jacket':'jaqueta','coat':'casaco','sweater':'suéter',
-  'hoodie':'moletom','suit':'terno','tie':'gravata','belt':'cinto','hat':'chapéu',
-  'cap':'boné','beanie':'gorro','scarf':'cachecol','gloves':'luvas',
-  'socks':'meias','sock':'meia','glasses':'óculos','sunglasses':'óculos de sol',
-  'watch':'relógio de pulso','handbag':'bolsa','purse':'bolsa','bag':'bolsa',
-  'backpack':'mochila','luggage':'mala','suitcase':'mala','wallet':'carteira',
-  'umbrella':'guarda-chuva','ring':'anel','necklace':'colar','earring':'brinco',
-  'bracelet':'pulseira',
-  'book':'livro','notebook':'caderno','notepad':'bloco de notas','pen':'caneta',
-  'pencil':'lápis','marker':'caneta marcador','highlighter':'marca-texto',
-  'scissors':'tesoura','tape':'fita adesiva','stapler':'grampeador','ruler':'régua',
-  'eraser':'borracha','folder':'pasta','envelope':'envelope','paper':'papel',
-  'document':'documento','magazine':'revista','newspaper':'jornal',
-  'fork':'garfo','knife':'faca','spoon':'colher','plate':'prato','bowl':'tigela',
-  'cup':'xícara','mug':'caneca','glass':'copo','bottle':'garrafa',
-  'water bottle':'garrafa de água','wine glass':'taça de vinho',
-  'pan':'frigideira','pot':'panela','cutting board':'tábua de corte',
-  'spatula':'espátula','ladle':'concha','grater':'ralador',
-  'hammer':'martelo','screwdriver':'chave de fenda','wrench':'chave inglesa',
-  'pliers':'alicate','drill':'furadeira','saw':'serra','tape measure':'trena',
-  'toolbox':'caixa de ferramentas','ladder':'escada','paint brush':'pincel',
-  'bucket':'balde','broom':'vassoura','mop':'esfregão',
-  'ball':'bola','soccer ball':'bola de futebol','basketball':'bola de basquete',
-  'tennis racket':'raquete de tênis','bicycle':'bicicleta','bike':'bicicleta',
-  'skateboard':'skate','helmet':'capacete','yoga mat':'tapete de yoga',
-  'dumbbell':'haltere','guitar':'violão','piano':'piano','toy':'brinquedo',
-  'doll':'boneca','teddy bear':'ursinho de pelúcia','puzzle':'quebra-cabeça',
-  'dog':'cachorro','cat':'gato','bird':'pássaro','fish':'peixe',
-  'rabbit':'coelho','hamster':'hamster','turtle':'tartaruga',
-  'car':'carro','motorcycle':'moto','scooter':'patinete',
-  'key':'chave','keys':'chaves','box':'caixa','container':'pote','jar':'pote',
-  'basket':'cesta','plant':'planta','flower':'flor','flower pot':'vaso de planta',
-  'vase':'vaso','candle':'vela','trophy':'troféu','medal':'medalha',
-  'medicine':'remédio','pill':'comprimido',
-  'toothbrush':'escova de dente','toothpaste':'pasta de dente',
-  'shampoo':'shampoo','soap':'sabonete','perfume':'perfume','makeup':'maquiagem',
-  'lipstick':'batom','comb':'pente','hair dryer':'secador','razor':'barbeador',
-  'sunscreen':'protetor solar',
-  'person':'pessoa','man':'homem','woman':'mulher','child':'criança','baby':'bebê',
-};
-
-function tr(label) {
-  let l = label.toLowerCase()
-    .replace(/^n\d+\s+/, '')
-    .split(',')[0]
-    .trim();
-
-  if (T[l]) return T[l];
-
-  // Match por palavra completa
-  for (const [en, pt] of Object.entries(T)) {
-    if (en.length < 4) continue;
-    const escaped = en.replace(/[-\/\\^$*+?.()|[\]{}]/g,'\\$&');
-    const regex = new RegExp('\\b' + escaped + '\\b');
-    if (regex.test(l)) return pt;
-  }
-
-  return l.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-}
-
-// ── Web Speech API ──
-function toggleVoice() {
-  if (isRec) { recog && recog.stop(); return; }
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { toast('Reconhecimento de voz requer Chrome ou Edge.', 'error'); return; }
-  recog = new SR();
-  recog.lang = 'pt-BR'; recog.continuous = false; recog.interimResults = true; recog.maxAlternatives = 3;
-
-  recog.onstart = () => {
-    isRec = true;
-    document.getElementById('btnVoice').className = 'btn rec';
-    document.getElementById('btnVoice').innerHTML = '<span class="dot"></span>Gravando...';
-    document.getElementById('voiceOut').className = 'voice-out';
-    document.getElementById('voiceOut').innerHTML = '<em style="color:var(--text3)">Fale o local agora...</em>';
-    voiceText = '';
-  };
-  recog.onresult = (e) => {
-    let interim = '', final = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) final += e.results[i][0].transcript;
-      else interim += e.results[i][0].transcript;
-    }
-    if (final) voiceText = final.trim();
-    document.getElementById('voiceOut').className = 'voice-out';
-    document.getElementById('voiceOut').textContent = voiceText || interim || '...';
-  };
-  recog.onend = () => {
-    isRec = false;
-    document.getElementById('btnVoice').className = 'btn';
-    document.getElementById('btnVoice').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Falar local`;
-    if (voiceText) saveItem();
-    else { document.getElementById('voiceOut').className = 'voice-out empty'; document.getElementById('voiceOut').textContent = 'Nada captado — tente novamente.'; }
-  };
-  recog.onerror = (e) => {
-    isRec = false;
-    document.getElementById('btnVoice').className = 'btn';
-    document.getElementById('btnVoice').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Falar local`;
-    const msgs = { 'no-speech':'Nada captado.', 'not-allowed':'Microfone negado.', 'network':'Erro de rede.' };
-    toast(msgs[e.error] || 'Erro: ' + e.error, 'error');
-  };
-  recog.start();
-}
-
-// ── Save ──
-function saveItem() {
-  if (!voiceText || !photoThumb) return;
-  const now = new Date();
-  const item = { id: Date.now(), name: pendingMain || 'objeto', labels: pendingLabels || [], location: voiceText, thumb: photoThumb, time: now.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) };
-  items.unshift(item);
-  try { localStorage.setItem('ong_items', JSON.stringify(items)); } catch(e) {}
-  render();
-  photoData = null; photoThumb = null; voiceText = ''; pendingLabels = null; pendingMain = null;
-  document.getElementById('voiceOut').className = 'voice-out empty';
-  document.getElementById('voiceOut').textContent = 'Aguardando gravação...';
-  document.getElementById('aiOut').className = 'ai-out';
-  document.getElementById('aiOut').style.color = 'var(--text3)';
-  document.getElementById('aiOut').textContent = 'Tire uma foto para identificar os objetos.';
-  document.getElementById('btnVoice').disabled = true;
-  step(4); setTimeout(() => step(1), 1800);
-  toast('✓ ' + item.name + '\nsalvo em "' + item.location + '"', 'success');
-}
-
-// ── Render ──
-function render() {
-  const q = (document.getElementById('search').value || '').toLowerCase().trim();
-  const filtered = items.filter(it => !q || it.name.toLowerCase().includes(q) || it.location.toLowerCase().includes(q) || (it.labels||[]).some(l => l.toLowerCase().includes(q)));
-  document.getElementById('lcount').textContent = filtered.length + (filtered.length === 1 ? ' item' : ' itens');
-  const el = document.getElementById('items');
-  if (!filtered.length) { el.innerHTML = items.length === 0 ? '<div class="empty">Nenhum objeto registrado ainda.<br>Tire uma foto e diga onde está guardando.</div>' : `<div class="empty">Nenhum resultado para "${q}".</div>`; return; }
-  el.innerHTML = filtered.map(it => `
-    <div class="card">
-      <img class="thumb" src="${it.thumb}" alt="${it.name}" />
-      <div class="ci">
-        <div class="cn">${it.name}</div>
-        <div class="ctags">${(it.labels||[]).filter(l=>l!==it.name).slice(0,4).map(l=>`<span class="ctag">${l}</span>`).join('')}</div>
-        <div class="cl"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${it.location}</div>
-        <div class="ct">${it.time}</div>
-      </div>
-      <button class="del" onclick="delItem(${it.id})">✕</button>
-    </div>`).join('');
-}
-
-function delItem(id) {
-  items = items.filter(i => i.id !== id);
-  try { localStorage.setItem('ong_items', JSON.stringify(items)); } catch(e) {}
-  render(); toast('Item removido', 'warn');
-}
-
-// ── Toast ──
-let tt;
-function toast(msg, type='info') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.style.background = type==='success'?'#14532d':type==='error'?'#7f1d1d':type==='warn'?'#78350f':'#1c1b18';
-  el.classList.add('show'); clearTimeout(tt);
-  tt = setTimeout(() => el.classList.remove('show'), 4000);
-}
-</script>
-</body>
-</html>
+Seja específico: prefira 'tênis Nike branco' a apenas 'sapato'. Use por
