@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -53,12 +52,20 @@
 
   .setup-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.125rem; margin-bottom: 1rem; }
   .setup-card h3 { font-size: 13px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 7px; }
-  .setup-card .sub { font-size: 12px; color: var(--text2); margin-bottom: 9px; line-height: 1.5; }
+  .setup-card .sub { font-size: 12px; color: var(--text2); margin-bottom: 9px; line-height: 1.6; }
   .setup-card .sub a { color: var(--blue-text); }
+  .field-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 5px; margin-top: 10px; }
   .setup-row { display: flex; gap: 8px; }
-  .setup-row input { flex: 1; padding: 10px 12px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--bg); color: var(--text); font-size: 14px; outline: none; -webkit-appearance: none; font-family: monospace; }
-  .setup-row input:focus { border-color: var(--blue); }
-  .setup-row input::placeholder { font-family: -apple-system, sans-serif; color: var(--text3); font-size: 13px; }
+  .setup-row input, .full-input {
+    flex: 1; width: 100%; padding: 10px 12px; border-radius: var(--radius);
+    border: 1px solid var(--border2); background: var(--bg);
+    color: var(--text); font-size: 13px; outline: none;
+    -webkit-appearance: none; font-family: monospace;
+  }
+  .setup-row input:focus, .full-input:focus { border-color: var(--blue); }
+  .setup-row input::placeholder, .full-input::placeholder { font-family: -apple-system, sans-serif; color: var(--text3); }
+  .save-btn { margin-top: 10px; width: 100%; padding: 11px; border-radius: var(--radius); border: none; background: var(--blue); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+  .save-btn:active { opacity: .8; }
   .key-status { font-size: 12px; margin-top: 7px; color: var(--text2); }
   .key-status.ok { color: var(--green-text); font-weight: 600; }
   .key-status.err { color: var(--red-text); }
@@ -73,7 +80,7 @@
   .flash.on { opacity: .8; }
 
   .btn-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: .9rem; }
-  .btn { padding: 14px 6px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--surface); color: var(--text); font-size: 12px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; transition: opacity .12s; touch-action: manipulation; min-height: 64px; }
+  .btn { padding: 14px 6px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--surface); color: var(--text); font-size: 12px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; touch-action: manipulation; min-height: 64px; transition: opacity .1s; }
   .btn:active:not(:disabled) { opacity: .6; transform: scale(0.96); }
   .btn:disabled { opacity: .32; cursor: not-allowed; }
   .btn.blue { background: var(--blue); color: #fff; border-color: transparent; }
@@ -81,7 +88,7 @@
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
   .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--red); animation: pulse 1s ease-in-out infinite; }
 
-  .upload-label { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px; border-radius: var(--radius); border: 1px dashed var(--border2); background: var(--surface); color: var(--text2); font-size: 13px; cursor: pointer; margin-bottom: .9rem; touch-action: manipulation; font-weight: 500; }
+  .upload-label { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px; border-radius: var(--radius); border: 1px dashed var(--border2); background: var(--surface); color: var(--text2); font-size: 13px; cursor: pointer; margin-bottom: .9rem; font-weight: 500; touch-action: manipulation; }
   .upload-label:active { background: var(--surface2); }
   #fileInput { display: none; }
 
@@ -144,22 +151,27 @@
     <div class="step" id="s4">✓ Salvo</div>
   </div>
 
-  <!-- API Key -->
+  <!-- Setup -->
   <div class="setup-card">
     <h3>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      Hugging Face — <span style="color:var(--green-text)">100% grátis, sem cartão</span>
+      Configuração — ambos gratuitos
     </h3>
     <div class="sub">
-      1. Crie conta em <a href="https://huggingface.co" target="_blank">huggingface.co</a><br>
-      2. Avatar → Settings → <strong>Access Tokens</strong> → New token → Read → Create<br>
-      3. Cole o token abaixo (começa com <code>hf_</code>)
+      <strong>Token Hugging Face:</strong> <a href="https://huggingface.co/settings/tokens" target="_blank">huggingface.co</a> → Settings → Access Tokens → New token (Read)<br>
+      <strong>URL do Worker:</strong> <a href="https://workers.cloudflare.com" target="_blank">workers.cloudflare.com</a> → cole o código do proxy e faça deploy
     </div>
+
+    <div class="field-label">Token Hugging Face (hf_...)</div>
     <div class="setup-row">
-      <input type="password" id="apiKey" placeholder="hf_..." autocomplete="off" />
-      <button class="btn blue" onclick="saveKey()" style="min-height:auto;flex-direction:row;padding:10px 16px;font-size:13px">Salvar</button>
+      <input type="password" id="hfKey" placeholder="hf_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
     </div>
-    <div class="key-status" id="keyStatus">Aguardando token do Hugging Face...</div>
+
+    <div class="field-label">URL do Cloudflare Worker</div>
+    <input class="full-input" type="url" id="workerUrl" placeholder="https://meu-worker.usuario.workers.dev" autocomplete="off" />
+
+    <button class="save-btn" onclick="saveConfig()">Salvar configuração</button>
+    <div class="key-status" id="keyStatus">Preencha os dois campos acima para começar.</div>
   </div>
 
   <!-- Camera -->
@@ -188,26 +200,22 @@
     </button>
   </div>
 
-  <!-- Galeria fallback -->
   <label class="upload-label" for="fileInput">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
     Ou escolha uma foto da galeria
   </label>
   <input type="file" id="fileInput" accept="image/*" onchange="handleFile(event)" />
 
-  <!-- Voice -->
   <div class="panel">
     <div class="plabel">Você disse</div>
     <div class="voice-out empty" id="voiceOut">Aguardando gravação...</div>
   </div>
 
-  <!-- AI result -->
   <div class="panel">
     <div class="plabel">Objetos identificados — Hugging Face AI</div>
     <div class="ai-out" id="aiOut" style="color:var(--text3);font-size:14px">Tire uma foto para identificar os objetos.</div>
   </div>
 
-  <!-- List -->
   <div class="lh">
     <span class="lt">Registrados</span>
     <span class="lc" id="lcount">0 itens</span>
@@ -224,40 +232,51 @@
 <script>
 // ── State ──
 let stream = null, cameraOn = false;
-let photoData = null, photoThumb = null, photoBlob = null;
+let photoData = null, photoThumb = null;
 let pendingLabels = null, pendingMain = null;
 let voiceText = '', isRec = false, recog = null;
 let items = [];
-let apiKey = '';
+let hfKey = '', workerUrl = '';
 
 try { items = JSON.parse(localStorage.getItem('ong_items') || '[]'); } catch(e) {}
-try { apiKey = localStorage.getItem('ong_key') || ''; } catch(e) {}
+try { hfKey = localStorage.getItem('ong_hf') || ''; } catch(e) {}
+try { workerUrl = localStorage.getItem('ong_worker') || ''; } catch(e) {}
 
-if (apiKey) {
+if (hfKey && workerUrl) {
   document.getElementById('keyStatus').className = 'key-status ok';
-  document.getElementById('keyStatus').textContent = '✓ Token salvo e pronto para usar.';
+  document.getElementById('keyStatus').textContent = '✓ Configuração salva e pronta!';
 }
 render();
 
-// ── API Key ──
-function saveKey() {
-  const v = document.getElementById('apiKey').value.trim();
-  if (!v) { toast('Cole o token primeiro'); return; }
-  if (!v.startsWith('hf_')) { toast('Token inválido — deve começar com hf_', 'error'); return; }
-  apiKey = v;
-  try { localStorage.setItem('ong_key', v); } catch(e) {}
-  document.getElementById('apiKey').value = '';
-  document.getElementById('apiKey').placeholder = 'Token salvo ✓';
-  document.getElementById('keyStatus').className = 'key-status ok';
-  document.getElementById('keyStatus').textContent = '✓ Token salvo com sucesso!';
-  toast('✓ Token salvo!', 'success');
+// ── Config ──
+function saveConfig() {
+  const hf = document.getElementById('hfKey').value.trim();
+  const wu = document.getElementById('workerUrl').value.trim();
+
+  const errs = [];
+  if (hf && !hf.startsWith('hf_')) errs.push('Token HF deve começar com hf_');
+  if (wu && !wu.startsWith('https://')) errs.push('URL do Worker deve começar com https://');
+
+  if (errs.length) { toast(errs.join('\n'), 'error'); return; }
+
+  if (hf) { hfKey = hf; try { localStorage.setItem('ong_hf', hf); } catch(e) {} }
+  if (wu) { workerUrl = wu.replace(/\/$/, ''); try { localStorage.setItem('ong_worker', workerUrl); } catch(e) {} }
+
+  document.getElementById('hfKey').value = '';
+  document.getElementById('workerUrl').value = '';
+
+  const ok = hfKey && workerUrl;
+  document.getElementById('keyStatus').className = ok ? 'key-status ok' : 'key-status';
+  document.getElementById('keyStatus').textContent = ok
+    ? '✓ Tudo configurado! Pode tirar fotos.'
+    : 'Falta: ' + (!hfKey ? 'token HF ' : '') + (!workerUrl ? 'URL do Worker' : '');
+  if (ok) toast('✓ Configuração salva!', 'success');
 }
 
 // ── Steps ──
 function step(n) {
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i <= 4; i++)
     document.getElementById('s'+i).className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
-  }
 }
 
 // ── Camera ──
@@ -277,7 +296,9 @@ async function toggleCamera() {
     document.getElementById('btnSnap').disabled = false;
     step(1);
   } catch(e) {
-    toast(e.name === 'NotAllowedError' ? 'Permissão de câmera negada.\nUse "Escolher foto da galeria" abaixo.' : 'Erro: ' + e.message, 'error');
+    toast(e.name === 'NotAllowedError'
+      ? 'Permissão negada.\nUse "Escolher foto" abaixo como alternativa.'
+      : 'Erro: ' + e.message, 'error');
   }
 }
 
@@ -290,6 +311,7 @@ function stopCam() {
   document.getElementById('btnSnap').disabled = true;
 }
 
+// ── Photo ──
 function takePhoto() {
   const v = document.getElementById('video');
   const c = document.getElementById('canvas');
@@ -315,21 +337,15 @@ function handleFile(e) {
     };
     img.src = ev.target.result;
   };
-  reader.readAsDataURL(file);
-  e.target.value = '';
+  reader.readAsDataURL(file); e.target.value = '';
 }
 
 function processCanvas(c) {
-  // base64 para thumb display
   const tc = document.createElement('canvas');
   tc.width = 120; tc.height = 90;
   tc.getContext('2d').drawImage(c, 0, 0, 120, 90);
   photoThumb = tc.toDataURL('image/jpeg', 0.7);
-
-  // Blob para enviar à API (Hugging Face aceita binário)
-  c.toBlob(blob => { photoBlob = blob; }, 'image/jpeg', 0.85);
   photoData = c.toDataURL('image/jpeg', 0.85).split(',')[1];
-
   pendingLabels = null; pendingMain = null; voiceText = '';
   document.getElementById('voiceOut').className = 'voice-out empty';
   document.getElementById('voiceOut').textContent = 'Aguardando gravação...';
@@ -338,98 +354,80 @@ function processCanvas(c) {
   analyzeImage();
 }
 
-// ═══════════════════════════════════════════════════════════
-//  HUGGING FACE INFERENCE API
-//  Modelo: google/vit-base-patch16-224  (image classification)
-//  Endpoint: https://api-inference.huggingface.co/models/<model>
-//  Autenticação: Bearer token no header Authorization
-//  Free tier: ~30.000 req/mês sem cartão
-// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════
+//  ANÁLISE VIA CLOUDFLARE WORKER → HUGGING FACE
+//  Worker resolve o CORS e repassa ao HF
+// ═══════════════════════════════════════════════════
 async function analyzeImage() {
   const out = document.getElementById('aiOut');
-  out.className = 'ai-out loading';
-  out.innerHTML = '<div class="spinner"></div> Identificando com Hugging Face AI...';
 
-  if (!apiKey) {
+  if (!hfKey || !workerUrl) {
     out.className = 'ai-out';
     out.style.color = 'var(--text3)';
-    out.textContent = 'Sem token — adicione o token do Hugging Face para identificar objetos.';
+    out.textContent = 'Configure o token e a URL do Worker acima para ativar a IA.';
     pendingLabels = ['objeto']; pendingMain = 'objeto';
     step(3); return;
   }
 
-  // Converte base64 → Blob para envio binário
-  const byteStr = atob(photoData);
-  const ab = new ArrayBuffer(byteStr.length);
-  const ia = new Uint8Array(ab);
-  for (let i = 0; i < byteStr.length; i++) ia[i] = byteStr.charCodeAt(i);
-  const imgBlob = new Blob([ab], { type: 'image/jpeg' });
+  out.className = 'ai-out loading';
+  out.innerHTML = '<div class="spinner"></div> Identificando objetos...';
 
-  // Tenta modelo de object detection primeiro, fallback para classification
-  const models = [
-    { url: 'https://api-inference.huggingface.co/models/facebook/detr-resnet-50', type: 'detection' },
-    { url: 'https://api-inference.huggingface.co/models/google/vit-base-patch16-224', type: 'classification' },
-  ];
+  try {
+    const res = await fetch(workerUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: hfKey, imageBase64: photoData })
+    });
 
-  let lastError = '';
-  for (const model of models) {
-    try {
-      const res = await fetch(model.url, {
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      throw new Error(e?.error || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+
+    // Trata resposta de modelo em cold start
+    if (data?.error?.includes('loading')) {
+      out.innerHTML = '<div class="spinner"></div> Modelo iniciando (aguarde ~20s)...';
+      await new Promise(r => setTimeout(r, 12000));
+      const res2 = await fetch(workerUrl, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${apiKey}` },
-        body: imgBlob
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: hfKey, imageBase64: photoData })
       });
+      const data2 = await res2.json();
+      return processResult(data2, out);
+    }
 
-      // Modelo ainda carregando (cold start)
-      if (res.status === 503) {
-        out.innerHTML = '<div class="spinner"></div> Modelo iniciando (pode levar ~20s na primeira vez)...';
-        await new Promise(r => setTimeout(r, 8000));
-        const res2 = await fetch(model.url, { method: 'POST', headers: { 'Authorization': `Bearer ${apiKey}` }, body: imgBlob });
-        if (!res2.ok) { lastError = `HTTP ${res2.status}`; continue; }
-        const data2 = await res2.json();
-        processResult(data2, model.type, out);
-        return;
-      }
+    processResult(data, out);
 
-      if (!res.ok) { const e = await res.json().catch(()=>{}); lastError = e?.error || `HTTP ${res.status}`; continue; }
-      const data = await res.json();
-      processResult(data, model.type, out);
-      return;
-
-    } catch(e) { lastError = e.message; continue; }
+  } catch(e) {
+    out.className = 'ai-out';
+    out.style.color = 'var(--red-text)';
+    out.textContent = '⚠ ' + e.message;
+    pendingLabels = ['objeto']; pendingMain = 'objeto';
+    step(3);
   }
-
-  // Todos falharam
-  out.className = 'ai-out';
-  out.style.color = 'var(--red-text)';
-  out.textContent = '⚠ ' + lastError;
-  pendingLabels = ['objeto']; pendingMain = 'objeto';
-  step(3);
 }
 
-function processResult(data, type, out) {
+function processResult(data, out) {
   let labels = [];
 
-  if (type === 'detection' && Array.isArray(data)) {
-    // DETR: [{label, score, box}, ...]
+  if (Array.isArray(data)) {
+    // DETR: [{label, score, box}] ou ViT: [{label, score}]
     const seen = new Set();
     for (const d of data) {
+      if (d.score < 0.3) continue;
       const name = tr(d.label);
-      if (!seen.has(name) && d.score > 0.5) { seen.add(name); labels.push({ name, score: d.score }); }
-    }
-  } else if (Array.isArray(data)) {
-    // ViT classification: [{label, score}, ...]
-    for (const d of data.slice(0, 6)) {
-      // ViT labels são tipo "n02084071 dog" — pegar só a parte descritiva
-      const raw = d.label.replace(/^n\d+\s+/, '').split(',')[0].trim();
-      labels.push({ name: tr(raw), score: d.score });
+      if (!seen.has(name)) { seen.add(name); labels.push({ name, score: d.score }); }
+      if (labels.length >= 6) break;
     }
   }
 
   if (!labels.length) {
     out.className = 'ai-out';
     out.style.color = 'var(--text3)';
-    out.textContent = 'Nenhum objeto identificado com confiança suficiente.';
+    out.textContent = 'Nenhum objeto identificado. Tente uma foto mais nítida.';
     pendingLabels = ['objeto']; pendingMain = 'objeto';
     step(3); return;
   }
@@ -444,24 +442,23 @@ function processResult(data, type, out) {
   out.className = 'ai-out';
   out.innerHTML = `<div style="margin-bottom:5px">${tags}</div><div class="ai-desc">Principal: <strong>${pendingMain}</strong></div>`;
   step(3);
-  toast('Objeto identificado!\nDiga onde vai guardar.', 'success');
+  toast('Objeto identificado!\nAgora diga onde vai guardar.', 'success');
 }
 
 // ── Tradução EN→PT ──
-const T = {'laptop':'notebook','computer':'computador','keyboard':'teclado','mouse':'mouse','monitor':'monitor','cell phone':'celular','mobile phone':'celular','phone':'celular','smartphone':'celular','tablet computer':'tablet','tablet':'tablet','camera':'câmera','headphones':'fone de ouvido','television':'televisão','tv':'TV','remote control':'controle remoto','book':'livro','bag':'bolsa','backpack':'mochila','handbag':'bolsa','wallet':'carteira','umbrella':'guarda-chuva','glasses':'óculos','sunglasses':'óculos de sol','watch':'relógio','keys':'chaves','key':'chave','bottle':'garrafa','cup':'xícara','mug':'caneca','chair':'cadeira','table':'mesa','desk':'escrivaninha','sofa':'sofá','couch':'sofá','bed':'cama','lamp':'luminária','scissors':'tesoura','pen':'caneta','pencil':'lápis','shoe':'sapato','sneaker':'tênis','hat':'chapéu','cap':'boné','remote':'controle','box':'caixa','toy':'brinquedo','bicycle':'bicicleta','dog':'cachorro','cat':'gato','clock':'relógio de parede','mirror':'espelho','plant':'planta','flower':'flor','pillow':'travesseiro','blanket':'cobertor','suitcase':'mala','backpack':'mochila','tie':'gravata','belt':'cinto','fork':'garfo','knife':'faca','spoon':'colher','bowl':'tigela','plate':'prato','person':'pessoa','car':'carro','bicycle':'bicicleta','motorcycle':'moto'};
+const T = {'laptop':'notebook','computer':'computador','keyboard':'teclado','mouse':'mouse','monitor':'monitor','cell phone':'celular','mobile phone':'celular','phone':'celular','smartphone':'celular','tablet':'tablet','camera':'câmera','headphones':'fone de ouvido','television':'televisão','tv':'TV','remote control':'controle remoto','book':'livro','bag':'bolsa','backpack':'mochila','handbag':'bolsa','wallet':'carteira','umbrella':'guarda-chuva','glasses':'óculos','sunglasses':'óculos de sol','watch':'relógio de pulso','keys':'chaves','key':'chave','bottle':'garrafa','cup':'xícara','mug':'caneca','chair':'cadeira','table':'mesa','desk':'escrivaninha','sofa':'sofá','couch':'sofá','bed':'cama','lamp':'luminária','scissors':'tesoura','pen':'caneta','pencil':'lápis','shoe':'sapato','sneakers':'tênis','hat':'chapéu','cap':'boné','box':'caixa','toy':'brinquedo','bicycle':'bicicleta','clock':'relógio de parede','mirror':'espelho','plant':'planta','flower':'flor','pillow':'travesseiro','suitcase':'mala','person':'pessoa','car':'carro','motorcycle':'moto','dog':'cachorro','cat':'gato','remote':'controle','fork':'garfo','knife':'faca','spoon':'colher','bowl':'tigela','plate':'prato'};
 function tr(label) {
-  const l = label.toLowerCase();
+  const l = label.toLowerCase().replace(/^n\d+\s+/, '').split(',')[0].trim();
   if (T[l]) return T[l];
   for (const [en, pt] of Object.entries(T)) { if (l.includes(en) && en.length > 3) return pt; }
-  // Capitalizar primeira letra se ficou em inglês
-  return label.charAt(0).toUpperCase() + label.slice(1);
+  return l.charAt(0).toUpperCase() + l.slice(1);
 }
 
 // ── Web Speech API ──
 function toggleVoice() {
   if (isRec) { recog && recog.stop(); return; }
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { toast('Voz requer Chrome ou Edge.', 'error'); return; }
+  if (!SR) { toast('Reconhecimento de voz requer Chrome ou Edge.', 'error'); return; }
   recog = new SR();
   recog.lang = 'pt-BR'; recog.continuous = false; recog.interimResults = true; recog.maxAlternatives = 3;
 
@@ -508,8 +505,7 @@ function saveItem() {
   items.unshift(item);
   try { localStorage.setItem('ong_items', JSON.stringify(items)); } catch(e) {}
   render();
-  photoData = null; photoThumb = null; photoBlob = null; voiceText = '';
-  pendingLabels = null; pendingMain = null;
+  photoData = null; photoThumb = null; voiceText = ''; pendingLabels = null; pendingMain = null;
   document.getElementById('voiceOut').className = 'voice-out empty';
   document.getElementById('voiceOut').textContent = 'Aguardando gravação...';
   document.getElementById('aiOut').className = 'ai-out';
