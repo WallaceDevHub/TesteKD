@@ -449,13 +449,105 @@ function processResult(data, out) {
   toast('Objeto identificado!\nAgora diga onde vai guardar.', 'success');
 }
 
-// ── Tradução EN→PT ──
-const T = {'laptop':'notebook','computer':'computador','keyboard':'teclado','mouse':'mouse','monitor':'monitor','cell phone':'celular','mobile phone':'celular','phone':'celular','smartphone':'celular','tablet':'tablet','camera':'câmera','headphones':'fone de ouvido','television':'televisão','tv':'TV','remote control':'controle remoto','book':'livro','bag':'bolsa','backpack':'mochila','handbag':'bolsa','wallet':'carteira','umbrella':'guarda-chuva','glasses':'óculos','sunglasses':'óculos de sol','watch':'relógio de pulso','keys':'chaves','key':'chave','bottle':'garrafa','cup':'xícara','mug':'caneca','chair':'cadeira','table':'mesa','desk':'escrivaninha','sofa':'sofá','couch':'sofá','bed':'cama','lamp':'luminária','scissors':'tesoura','pen':'caneta','pencil':'lápis','shoe':'sapato','sneakers':'tênis','hat':'chapéu','cap':'boné','box':'caixa','toy':'brinquedo','bicycle':'bicicleta','clock':'relógio de parede','mirror':'espelho','plant':'planta','flower':'flor','pillow':'travesseiro','suitcase':'mala','person':'pessoa','car':'carro','motorcycle':'moto','dog':'cachorro','cat':'gato','remote':'controle','fork':'garfo','knife':'faca','spoon':'colher','bowl':'tigela','plate':'prato'};
+// ── Tradução EN→PT (dicionário expandido) ──
+const T = {
+  'laptop':'notebook','laptop computer':'notebook','notebook computer':'notebook',
+  'computer':'computador','desktop computer':'computador desktop','computer keyboard':'teclado',
+  'keyboard':'teclado','computer mouse':'mouse','mouse':'mouse','monitor':'monitor',
+  'computer monitor':'monitor','screen':'tela','cell phone':'celular','mobile phone':'celular',
+  'phone':'celular','smartphone':'celular','tablet':'tablet','tablet computer':'tablet',
+  'camera':'câmera','digital camera':'câmera digital','video camera':'câmera de vídeo',
+  'headphones':'fone de ouvido','earphones':'fone de ouvido','earbuds':'fone sem fio',
+  'headset':'headset','speaker':'caixa de som','bluetooth speaker':'caixa bluetooth',
+  'television':'televisão','tv':'televisão','flat screen tv':'TV de tela plana',
+  'remote control':'controle remoto','remote':'controle remoto',
+  'game controller':'controle de videogame','joystick':'joystick',
+  'charger':'carregador','power bank':'carregador portátil','cable':'cabo',
+  'usb cable':'cabo USB','hdmi cable':'cabo HDMI','adapter':'adaptador',
+  'router':'roteador','modem':'modem','printer':'impressora','scanner':'scanner',
+  'projector':'projetor','hard drive':'HD externo','usb drive':'pen drive',
+  'flash drive':'pen drive','memory card':'cartão de memória','battery':'bateria',
+  'power strip':'extensão elétrica','calculator':'calculadora','alarm clock':'despertador',
+  'smart watch':'smartwatch','smartwatch':'smartwatch',
+  'chair':'cadeira','armchair':'poltrona','office chair':'cadeira de escritório',
+  'table':'mesa','dining table':'mesa de jantar','coffee table':'mesa de centro',
+  'desk':'escrivaninha','bookshelf':'estante','bookcase':'estante de livros',
+  'shelf':'prateleira','cabinet':'armário','wardrobe':'guarda-roupa','closet':'armário',
+  'drawer':'gaveta','dresser':'cômoda','nightstand':'criado-mudo','bed':'cama',
+  'sofa':'sofá','couch':'sofá','ottoman':'puff','bench':'banco','stool':'banquinho',
+  'lamp':'luminária','floor lamp':'abajur de chão','table lamp':'abajur',
+  'ceiling light':'lustre','chandelier':'lustre','fan':'ventilador',
+  'air conditioner':'ar-condicionado','heater':'aquecedor','mirror':'espelho',
+  'picture frame':'porta-retrato','painting':'quadro','clock':'relógio de parede',
+  'wall clock':'relógio de parede','curtain':'cortina','rug':'tapete','carpet':'tapete',
+  'pillow':'travesseiro','cushion':'almofada','blanket':'cobertor','towel':'toalha',
+  'laundry basket':'cesto de roupa','trash can':'lixeira',
+  'vacuum cleaner':'aspirador de pó','iron':'ferro de passar',
+  'washing machine':'máquina de lavar','refrigerator':'geladeira','fridge':'geladeira',
+  'microwave':'micro-ondas','oven':'forno','stove':'fogão','blender':'liquidificador',
+  'toaster':'torradeira','kettle':'chaleira','coffee maker':'cafeteira',
+  'shoe':'sapato','shoes':'sapatos','sneaker':'tênis','sneakers':'tênis',
+  'boot':'bota','boots':'botas','sandal':'sandália','sandals':'sandálias',
+  'slipper':'chinelo','high heel':'salto alto','shirt':'camisa','t-shirt':'camiseta',
+  'blouse':'blusa','pants':'calça','jeans':'jeans','shorts':'shorts','skirt':'saia',
+  'dress':'vestido','jacket':'jaqueta','coat':'casaco','sweater':'suéter',
+  'hoodie':'moletom','suit':'terno','tie':'gravata','belt':'cinto','hat':'chapéu',
+  'cap':'boné','beanie':'gorro','scarf':'cachecol','gloves':'luvas',
+  'socks':'meias','sock':'meia','glasses':'óculos','sunglasses':'óculos de sol',
+  'watch':'relógio de pulso','handbag':'bolsa','purse':'bolsa','bag':'bolsa',
+  'backpack':'mochila','luggage':'mala','suitcase':'mala','wallet':'carteira',
+  'umbrella':'guarda-chuva','ring':'anel','necklace':'colar','earring':'brinco',
+  'bracelet':'pulseira',
+  'book':'livro','notebook':'caderno','notepad':'bloco de notas','pen':'caneta',
+  'pencil':'lápis','marker':'caneta marcador','highlighter':'marca-texto',
+  'scissors':'tesoura','tape':'fita adesiva','stapler':'grampeador','ruler':'régua',
+  'eraser':'borracha','folder':'pasta','envelope':'envelope','paper':'papel',
+  'document':'documento','magazine':'revista','newspaper':'jornal',
+  'fork':'garfo','knife':'faca','spoon':'colher','plate':'prato','bowl':'tigela',
+  'cup':'xícara','mug':'caneca','glass':'copo','bottle':'garrafa',
+  'water bottle':'garrafa de água','wine glass':'taça de vinho',
+  'pan':'frigideira','pot':'panela','cutting board':'tábua de corte',
+  'spatula':'espátula','ladle':'concha','grater':'ralador',
+  'hammer':'martelo','screwdriver':'chave de fenda','wrench':'chave inglesa',
+  'pliers':'alicate','drill':'furadeira','saw':'serra','tape measure':'trena',
+  'toolbox':'caixa de ferramentas','ladder':'escada','paint brush':'pincel',
+  'bucket':'balde','broom':'vassoura','mop':'esfregão',
+  'ball':'bola','soccer ball':'bola de futebol','basketball':'bola de basquete',
+  'tennis racket':'raquete de tênis','bicycle':'bicicleta','bike':'bicicleta',
+  'skateboard':'skate','helmet':'capacete','yoga mat':'tapete de yoga',
+  'dumbbell':'haltere','guitar':'violão','piano':'piano','toy':'brinquedo',
+  'doll':'boneca','teddy bear':'ursinho de pelúcia','puzzle':'quebra-cabeça',
+  'dog':'cachorro','cat':'gato','bird':'pássaro','fish':'peixe',
+  'rabbit':'coelho','hamster':'hamster','turtle':'tartaruga',
+  'car':'carro','motorcycle':'moto','scooter':'patinete',
+  'key':'chave','keys':'chaves','box':'caixa','container':'pote','jar':'pote',
+  'basket':'cesta','plant':'planta','flower':'flor','flower pot':'vaso de planta',
+  'vase':'vaso','candle':'vela','trophy':'troféu','medal':'medalha',
+  'medicine':'remédio','pill':'comprimido',
+  'toothbrush':'escova de dente','toothpaste':'pasta de dente',
+  'shampoo':'shampoo','soap':'sabonete','perfume':'perfume','makeup':'maquiagem',
+  'lipstick':'batom','comb':'pente','hair dryer':'secador','razor':'barbeador',
+  'sunscreen':'protetor solar',
+  'person':'pessoa','man':'homem','woman':'mulher','child':'criança','baby':'bebê',
+};
+
 function tr(label) {
-  const l = label.toLowerCase().replace(/^n\d+\s+/, '').split(',')[0].trim();
+  let l = label.toLowerCase()
+    .replace(/^n\d+\s+/, '')
+    .split(',')[0]
+    .trim();
+
   if (T[l]) return T[l];
-  for (const [en, pt] of Object.entries(T)) { if (l.includes(en) && en.length > 3) return pt; }
-  return l.charAt(0).toUpperCase() + l.slice(1);
+
+  // Match por palavra completa
+  for (const [en, pt] of Object.entries(T)) {
+    if (en.length < 4) continue;
+    const escaped = en.replace(/[-\/\\^$*+?.()|[\]{}]/g,'\\$&');
+    const regex = new RegExp('\\b' + escaped + '\\b');
+    if (regex.test(l)) return pt;
+  }
+
+  return l.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 }
 
 // ── Web Speech API ──
