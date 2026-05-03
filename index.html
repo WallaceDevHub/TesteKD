@@ -53,15 +53,14 @@
   .setup-card .sub { font-size: 12px; color: var(--text2); margin-bottom: 10px; line-height: 1.65; }
   .setup-card .sub a { color: var(--blue-text); }
   .field-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 5px; margin-top: 10px; }
-  .setup-row { display: flex; gap: 8px; }
-  .setup-row input, .full-input {
-    flex: 1; width: 100%; padding: 10px 12px; border-radius: var(--radius);
+  .full-input {
+    width: 100%; padding: 10px 12px; border-radius: var(--radius);
     border: 1px solid var(--border2); background: var(--bg);
     color: var(--text); font-size: 13px; outline: none;
     -webkit-appearance: none; font-family: monospace;
   }
-  .setup-row input:focus, .full-input:focus { border-color: var(--blue); }
-  .setup-row input::placeholder, .full-input::placeholder { font-family: -apple-system, sans-serif; color: var(--text3); font-size: 13px; }
+  .full-input:focus { border-color: var(--blue); }
+  .full-input::placeholder { font-family: -apple-system, sans-serif; color: var(--text3); font-size: 13px; }
   .save-btn { margin-top: 10px; width: 100%; padding: 12px; border-radius: var(--radius); border: none; background: var(--blue); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
   .save-btn:active { opacity: .8; }
   .key-status { font-size: 12px; margin-top: 7px; }
@@ -99,8 +98,8 @@
   .ai-out.loading { color: var(--text2); display: flex; align-items: center; gap: 9px; }
   .spinner { width: 15px; height: 15px; border: 2px solid var(--border2); border-top-color: var(--blue); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .obj-name { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-  .obj-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+  .obj-name { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .obj-tags { display: flex; flex-wrap: wrap; gap: 5px; }
   .tag { display: inline-flex; align-items: center; background: var(--blue-bg); color: var(--blue-text); font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 99px; }
   .conf { font-size: 11px; opacity: .7; margin-left: 3px; }
 
@@ -140,7 +139,7 @@
     </div>
     <div>
       <h1>Onde Guardei?</h1>
-      <p>Foto + voz · Cloud Vision · 1.000 fotos/mês grátis</p>
+      <p>Foto + voz · Imagga · 1.000 fotos/mês grátis</p>
     </div>
   </div>
 
@@ -155,23 +154,22 @@
   <div class="setup-card">
     <h3>
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      Configuração
+      Imagga — <span style="color:var(--green-text)">grátis, sem cartão</span>
     </h3>
     <div class="sub">
-      <strong>API key:</strong> <a href="https://console.cloud.google.com/apis/credentials" target="_blank">console.cloud.google.com</a> → Credenciais → sua key<br>
-      <strong>Worker URL:</strong> a URL do seu Cloudflare Worker
+      1. Crie conta em <a href="https://imagga.com" target="_blank">imagga.com</a> → Sign up<br>
+      2. No painel copie a <strong>API Key</strong> e o <strong>API Secret</strong><br>
+      3. Cole os dois campos abaixo
     </div>
 
-    <div class="field-label">Google Cloud API Key (AIza...)</div>
-    <div class="setup-row">
-      <input type="password" id="apiKey" placeholder="AIzaSy..." autocomplete="off" />
-    </div>
+    <div class="field-label">API Key</div>
+    <input class="full-input" type="password" id="apiKey" placeholder="acc_xxxxxxxxxxxxxxxx" autocomplete="off" />
 
-    <div class="field-label">URL do Cloudflare Worker</div>
-    <input class="full-input" type="url" id="workerUrl" placeholder="https://meu-worker.usuario.workers.dev" autocomplete="off" />
+    <div class="field-label">API Secret</div>
+    <input class="full-input" type="password" id="apiSecret" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" style="margin-top:6px" />
 
     <button class="save-btn" onclick="saveConfig()">Salvar configuração</button>
-    <div class="key-status info" id="keyStatus">Preencha os dois campos para começar.</div>
+    <div class="key-status info" id="keyStatus">Aguardando API Key e Secret do Imagga...</div>
   </div>
 
   <!-- Camera -->
@@ -212,7 +210,7 @@
   </div>
 
   <div class="panel">
-    <div class="plabel">Objetos identificados — Google Cloud Vision</div>
+    <div class="plabel">Objetos identificados — Imagga</div>
     <div class="ai-out" id="aiOut" style="color:var(--text3);font-size:14px">Tire uma foto para identificar os objetos.</div>
   </div>
 
@@ -232,17 +230,17 @@
 <script>
 // ── State ──
 let stream = null, cameraOn = false;
-let photoData = null, photoThumb = null;
+let photoData = null, photoThumb = null, photoBlob = null;
 let pendingName = null, pendingTags = [];
 let voiceText = '', isRec = false, recog = null;
 let items = [];
-let apiKey = '', workerUrl = '';
+let apiKey = '', apiSecret = '';
 
 try { items = JSON.parse(localStorage.getItem('ong_items') || '[]'); } catch(e) {}
-try { apiKey = localStorage.getItem('ong_vision_key') || ''; } catch(e) {}
-try { workerUrl = localStorage.getItem('ong_worker_url') || ''; } catch(e) {}
+try { apiKey = localStorage.getItem('ong_imagga_key') || ''; } catch(e) {}
+try { apiSecret = localStorage.getItem('ong_imagga_secret') || ''; } catch(e) {}
 
-if (apiKey && workerUrl) {
+if (apiKey && apiSecret) {
   document.getElementById('keyStatus').className = 'key-status ok';
   document.getElementById('keyStatus').textContent = '✓ Configuração salva e pronta!';
 }
@@ -251,20 +249,17 @@ render();
 // ── Config ──
 function saveConfig() {
   const k = document.getElementById('apiKey').value.trim();
-  const w = document.getElementById('workerUrl').value.trim();
-  const errs = [];
-  if (k && !k.startsWith('AIza')) errs.push('API key deve começar com AIza');
-  if (w && !w.startsWith('https://')) errs.push('URL do Worker deve começar com https://');
-  if (errs.length) { toast(errs.join('\n'), 'error'); return; }
-  if (k) { apiKey = k; try { localStorage.setItem('ong_vision_key', k); } catch(e) {} }
-  if (w) { workerUrl = w.replace(/\/$/, ''); try { localStorage.setItem('ong_worker_url', workerUrl); } catch(e) {} }
+  const s = document.getElementById('apiSecret').value.trim();
+  if (!k && !s) { toast('Preencha a API Key e o Secret', 'warn'); return; }
+  if (k) { apiKey = k; try { localStorage.setItem('ong_imagga_key', k); } catch(e) {} }
+  if (s) { apiSecret = s; try { localStorage.setItem('ong_imagga_secret', s); } catch(e) {} }
   document.getElementById('apiKey').value = '';
-  document.getElementById('workerUrl').value = '';
-  const ok = apiKey && workerUrl;
+  document.getElementById('apiSecret').value = '';
+  const ok = apiKey && apiSecret;
   document.getElementById('keyStatus').className = ok ? 'key-status ok' : 'key-status info';
   document.getElementById('keyStatus').textContent = ok
     ? '✓ Tudo configurado! Pode tirar fotos.'
-    : 'Falta: ' + (!apiKey ? 'API key ' : '') + (!workerUrl ? 'URL do Worker' : '');
+    : 'Falta: ' + (!apiKey ? 'API Key ' : '') + (!apiSecret ? 'API Secret' : '');
   if (ok) toast('✓ Configuração salva!', 'success');
 }
 
@@ -340,73 +335,86 @@ function processCanvas(c) {
   tc.width = 120; tc.height = 90;
   tc.getContext('2d').drawImage(c, 0, 0, 120, 90);
   photoThumb = tc.toDataURL('image/jpeg', 0.7);
+
+  // Gera blob para envio multipart
+  c.toBlob(blob => { photoBlob = blob; }, 'image/jpeg', 0.85);
   photoData = c.toDataURL('image/jpeg', 0.85).split(',')[1];
+
   pendingName = null; pendingTags = []; voiceText = '';
   document.getElementById('voiceOut').className = 'voice-out empty';
   document.getElementById('voiceOut').textContent = 'Aguardando gravação...';
   document.getElementById('btnVoice').disabled = false;
   step(2);
-  analyzeImage();
+
+  // Pequeno delay para garantir que o blob foi gerado
+  setTimeout(analyzeImage, 100);
 }
 
 // ═══════════════════════════════════════════════════════════
-//  GOOGLE CLOUD VISION API via Cloudflare Worker
-//  Features: OBJECT_LOCALIZATION + LABEL_DETECTION
-//  Free tier: 1.000 req/mês
+//  IMAGGA API
+//  Endpoint: https://api.imagga.com/v2/tags
+//  Autenticação: Basic Auth (key:secret em base64)
+//  Suporta CORS direto do browser — sem proxy necessário!
+//  Free tier: 1.000 req/mês sem cartão
 // ═══════════════════════════════════════════════════════════
 async function analyzeImage() {
   const out = document.getElementById('aiOut');
   out.className = 'ai-out loading';
-  out.innerHTML = '<div class="spinner"></div> Identificando com Cloud Vision...';
+  out.innerHTML = '<div class="spinner"></div> Identificando com Imagga...';
 
-  if (!apiKey || !workerUrl) {
+  if (!apiKey || !apiSecret) {
     out.className = 'ai-out';
     out.style.color = 'var(--text3)';
-    out.textContent = 'Configure a API key e a URL do Worker acima.';
+    out.textContent = 'Configure a API Key e o Secret do Imagga acima.';
     pendingName = 'objeto'; pendingTags = [];
     step(3); return;
   }
 
   try {
-    const res = await fetch(workerUrl, {
+    // Imagga usa Basic Auth com key:secret em base64
+    const auth = btoa(`${apiKey}:${apiSecret}`);
+
+    // Envia imagem como multipart/form-data
+    const formData = new FormData();
+    const blob = photoBlob || new Blob(
+      [Uint8Array.from(atob(photoData), c => c.charCodeAt(0))],
+      { type: 'image/jpeg' }
+    );
+    formData.append('image', blob, 'photo.jpg');
+
+    const res = await fetch('https://api.imagga.com/v2/tags?limit=10&threshold=20', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ apiKey, imageBase64: photoData })
+      headers: { 'Authorization': `Basic ${auth}` },
+      body: formData
     });
 
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      throw new Error(e.status?.text || `HTTP ${res.status}`);
+    }
+
     const data = await res.json();
-    if (data.error) throw new Error(data.error);
+    const tags = data.result?.tags || [];
 
-    const r = data.responses?.[0];
-    if (!r) throw new Error('Resposta vazia da API');
+    if (!tags.length) throw new Error('Nenhum objeto identificado. Tente foto mais nítida.');
 
-    // Combina objetos localizados + labels
-    const seen = new Set();
-    const all = [];
+    // Filtra tags com confiança > 20% e traduz
+    const filtered = tags
+      .filter(t => t.confidence > 20)
+      .slice(0, 8)
+      .map(t => ({ name: tr(t.tag.en || t.tag.pt || Object.values(t.tag)[0]), score: t.confidence }));
 
-    for (const o of (r.localizedObjectAnnotations || [])) {
-      const name = tr(o.name);
-      if (!seen.has(name)) { seen.add(name); all.push({ name, score: o.score }); }
-    }
-    for (const l of (r.labelAnnotations || [])) {
-      const name = tr(l.description);
-      if (!seen.has(name)) { seen.add(name); all.push({ name, score: l.score }); }
-      if (all.length >= 8) break;
-    }
+    pendingName = filtered[0].name;
+    pendingTags = filtered.slice(1, 5).map(t => t.name);
 
-    if (!all.length) throw new Error('Nenhum objeto identificado. Tente foto mais nítida.');
-
-    pendingName = all[0].name;
-    pendingTags = all.slice(1, 5).map(i => i.name);
-
-    const tags = all.slice(0, 6).map(i =>
-      `<span class="tag">${i.name}<span class="conf">${Math.round(i.score * 100)}%</span></span>`
+    const tagHtml = filtered.slice(0, 6).map(t =>
+      `<span class="tag">${t.name}<span class="conf">${Math.round(t.score)}%</span></span>`
     ).join('');
 
     out.className = 'ai-out';
     out.innerHTML = `
       <div class="obj-name">${pendingName}</div>
-      <div class="obj-tags">${tags}</div>
+      <div class="obj-tags">${tagHtml}</div>
     `;
     step(3);
     toast('Objeto identificado!\nDiga onde vai guardar.', 'success');
@@ -423,64 +431,63 @@ async function analyzeImage() {
 // ── Tradução EN→PT ──
 const T = {
   'laptop':'notebook','laptop computer':'notebook','computer':'computador',
-  'keyboard':'teclado','computer mouse':'mouse','mouse':'mouse','monitor':'monitor',
+  'keyboard':'teclado','mouse':'mouse','monitor':'monitor','screen':'tela',
   'cell phone':'celular','mobile phone':'celular','phone':'celular','smartphone':'celular',
   'tablet':'tablet','camera':'câmera','headphones':'fone de ouvido','television':'televisão',
   'tv':'televisão','remote control':'controle remoto','remote':'controle remoto',
   'charger':'carregador','cable':'cabo','router':'roteador','printer':'impressora',
-  'hard drive':'HD externo','flash drive':'pen drive','calculator':'calculadora',
-  'smartwatch':'smartwatch','chair':'cadeira','armchair':'poltrona',
-  'table':'mesa','dining table':'mesa de jantar','coffee table':'mesa de centro',
-  'desk':'escrivaninha','bookshelf':'estante','shelf':'prateleira',
-  'cabinet':'armário','wardrobe':'guarda-roupa','drawer':'gaveta',
-  'dresser':'cômoda','nightstand':'criado-mudo','bed':'cama','sofa':'sofá',
-  'couch':'sofá','ottoman':'puff','bench':'banco','stool':'banquinho',
-  'lamp':'luminária','fan':'ventilador','air conditioner':'ar-condicionado',
-  'mirror':'espelho','picture frame':'porta-retrato','painting':'quadro',
-  'clock':'relógio de parede','wall clock':'relógio de parede','curtain':'cortina',
-  'rug':'tapete','pillow':'travesseiro','cushion':'almofada','blanket':'cobertor',
-  'towel':'toalha','trash can':'lixeira','vacuum cleaner':'aspirador de pó',
+  'speaker':'caixa de som','microphone':'microfone','calculator':'calculadora',
+  'chair':'cadeira','armchair':'poltrona','table':'mesa','desk':'escrivaninha',
+  'bookshelf':'estante','shelf':'prateleira','cabinet':'armário','wardrobe':'guarda-roupa',
+  'drawer':'gaveta','dresser':'cômoda','nightstand':'criado-mudo','bed':'cama',
+  'sofa':'sofá','couch':'sofá','bench':'banco','stool':'banquinho','lamp':'luminária',
+  'fan':'ventilador','air conditioner':'ar-condicionado','mirror':'espelho',
+  'picture frame':'porta-retrato','painting':'quadro','clock':'relógio de parede',
+  'curtain':'cortina','rug':'tapete','pillow':'travesseiro','cushion':'almofada',
+  'blanket':'cobertor','towel':'toalha','trash can':'lixeira',
   'washing machine':'máquina de lavar','refrigerator':'geladeira','fridge':'geladeira',
   'microwave':'micro-ondas','oven':'forno','stove':'fogão','blender':'liquidificador',
   'toaster':'torradeira','kettle':'chaleira','coffee maker':'cafeteira',
   'shoe':'sapato','shoes':'sapatos','sneaker':'tênis','sneakers':'tênis',
   'boot':'bota','boots':'botas','sandal':'sandália','slipper':'chinelo',
-  'shirt':'camisa','t-shirt':'camiseta','pants':'calça','jeans':'jeans',
-  'shorts':'shorts','skirt':'saia','dress':'vestido','jacket':'jaqueta',
-  'coat':'casaco','sweater':'suéter','hoodie':'moletom','suit':'terno',
-  'tie':'gravata','belt':'cinto','hat':'chapéu','cap':'boné','scarf':'cachecol',
-  'gloves':'luvas','socks':'meias','sock':'meia','glasses':'óculos',
-  'sunglasses':'óculos de sol','watch':'relógio de pulso','handbag':'bolsa',
-  'purse':'bolsa','bag':'bolsa','backpack':'mochila','luggage':'mala',
-  'suitcase':'mala','wallet':'carteira','umbrella':'guarda-chuva',
+  'shirt':'camisa','t-shirt':'camiseta','blouse':'blusa','pants':'calça',
+  'jeans':'jeans','shorts':'shorts','skirt':'saia','dress':'vestido',
+  'jacket':'jaqueta','coat':'casaco','sweater':'suéter','hoodie':'moletom',
+  'suit':'terno','tie':'gravata','belt':'cinto','hat':'chapéu','cap':'boné',
+  'scarf':'cachecol','gloves':'luvas','socks':'meias','sock':'meia',
+  'glasses':'óculos','sunglasses':'óculos de sol','watch':'relógio de pulso',
+  'handbag':'bolsa','purse':'bolsa','bag':'bolsa','backpack':'mochila',
+  'luggage':'mala','suitcase':'mala','wallet':'carteira','umbrella':'guarda-chuva',
   'ring':'anel','necklace':'colar','earring':'brinco','bracelet':'pulseira',
   'book':'livro','notebook':'caderno','pen':'caneta','pencil':'lápis',
-  'scissors':'tesoura','tape':'fita adesiva','stapler':'grampeador','ruler':'régua',
-  'eraser':'borracha','folder':'pasta','document':'documento','magazine':'revista',
+  'scissors':'tesoura','tape':'fita adesiva','stapler':'grampeador',
+  'ruler':'régua','eraser':'borracha','folder':'pasta','document':'documento',
   'fork':'garfo','knife':'faca','spoon':'colher','plate':'prato','bowl':'tigela',
   'cup':'xícara','mug':'caneca','glass':'copo','bottle':'garrafa',
   'water bottle':'garrafa de água','pan':'frigideira','pot':'panela',
   'hammer':'martelo','screwdriver':'chave de fenda','wrench':'chave inglesa',
-  'pliers':'alicate','drill':'furadeira','toolbox':'caixa de ferramentas',
-  'broom':'vassoura','mop':'esfregão','bucket':'balde',
+  'drill':'furadeira','toolbox':'caixa de ferramentas','broom':'vassoura',
+  'mop':'esfregão','bucket':'balde','vacuum cleaner':'aspirador de pó',
   'ball':'bola','bicycle':'bicicleta','bike':'bicicleta','helmet':'capacete',
   'guitar':'violão','piano':'piano','toy':'brinquedo','doll':'boneca',
   'teddy bear':'ursinho de pelúcia','puzzle':'quebra-cabeça',
   'dog':'cachorro','cat':'gato','bird':'pássaro','fish':'peixe','rabbit':'coelho',
-  'car':'carro','motorcycle':'moto','scooter':'patinete',
-  'key':'chave','keys':'chaves','box':'caixa','container':'pote','jar':'pote',
-  'plant':'planta','flower':'flor','vase':'vaso','candle':'vela',
-  'medicine':'remédio','toothbrush':'escova de dente','toothpaste':'pasta de dente',
-  'shampoo':'shampoo','soap':'sabonete','perfume':'perfume','makeup':'maquiagem',
-  'hair dryer':'secador','razor':'barbeador',
+  'car':'carro','motorcycle':'moto','key':'chave','keys':'chaves',
+  'box':'caixa','container':'pote','jar':'pote','plant':'planta',
+  'flower':'flor','vase':'vaso','candle':'vela','medicine':'remédio',
+  'toothbrush':'escova de dente','toothpaste':'pasta de dente',
+  'shampoo':'shampoo','soap':'sabonete','perfume':'perfume',
+  'makeup':'maquiagem','hair dryer':'secador','razor':'barbeador',
   'person':'pessoa','man':'homem','woman':'mulher','child':'criança','baby':'bebê',
-  'furniture':'móvel','clothing':'roupa','food':'alimento','animal':'animal',
-  'technology':'tecnologia','electronic device':'dispositivo eletrônico',
-  'home appliance':'eletrodoméstico','office supplies':'material de escritório',
+  'furniture':'móvel','clothing':'roupa','food':'alimento','technology':'tecnologia',
+  'electronic device':'dispositivo eletrônico','home appliance':'eletrodoméstico',
+  'wood':'madeira','plastic':'plástico','metal':'metal','glass':'vidro',
+  'indoor':'interior','outdoor':'exterior','no person':'sem pessoas',
 };
 
 function tr(label) {
-  const l = label.toLowerCase().replace(/^n\d+\s+/, '').split(',')[0].trim();
+  if (!label) return 'objeto';
+  const l = label.toLowerCase().trim();
   if (T[l]) return T[l];
   for (const [en, pt] of Object.entries(T)) {
     if (en.length < 4) continue;
@@ -552,7 +559,7 @@ function saveItem() {
   items.unshift(item);
   try { localStorage.setItem('ong_items', JSON.stringify(items)); } catch(e) {}
   render();
-  photoData = null; photoThumb = null; voiceText = '';
+  photoData = null; photoThumb = null; photoBlob = null; voiceText = '';
   pendingName = null; pendingTags = [];
   document.getElementById('voiceOut').className = 'voice-out empty';
   document.getElementById('voiceOut').textContent = 'Aguardando gravação...';
