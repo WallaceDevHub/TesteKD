@@ -416,14 +416,24 @@ Seja específico: prefira 'tênis Nike branco' a apenas 'sapato'. Use português
     try { parsed = JSON.parse(text); }
     catch(e) {
       // Tenta extrair JSON do texto se falhar
-      const match = text.match(/\{[\s\S]*\}/);
-      if (match) parsed = JSON.parse(match[0]);
-      else throw new Error('Resposta inesperada da IA');
+      const match = text.match(/\{[\s\S]*?\}/);
+      if (match) {
+        try { parsed = JSON.parse(match[0]); }
+        catch(e2) { throw new Error('Não foi possível interpretar: ' + text.substring(0, 100)); }
+      } else {
+        // Gemini às vezes responde só em texto sem JSON — extrai o nome direto
+        const lines = text.trim().split('\n').filter(l => l.trim());
+        parsed = {
+          nome: lines[0] ? lines[0].replace(/[*#_]/g, '').trim() : 'objeto',
+          tags: lines.slice(1, 4).map(l => l.replace(/[-*#_]/g, '').trim()).filter(Boolean),
+          descricao: lines[lines.length - 1] || ''
+        };
+      }
     }
 
-    pendingName = parsed.nome || 'objeto';
+    pendingName = parsed.nome || parsed.name || 'objeto';
     pendingTags = parsed.tags || [];
-    pendingDesc = parsed.descricao || '';
+    pendingDesc = parsed.descricao || parsed.description || '';
 
     const tags = pendingTags.slice(0, 4).map(t =>
       `<span class="tag">${t}</span>`
