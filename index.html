@@ -5,705 +5,266 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Onde Guardei?">
-<meta name="theme-color" content="#1a6ef5">
-<link rel="manifest" id="manifestLink">
+<meta name="theme-color" content="#1a72f5">
 <title>Onde Guardei?</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #f0f0f0;
-    --surface: #ffffff;
-    --blue: #1a6ef5;
-    --blue-dark: #1455c0;
-    --green: #1a9e4a;
-    --green-bg: #e6f9ee;
-    --green-text: #0f6630;
-    --red: #d92020;
-    --text: #1a1a1a;
-    --text2: #555;
-    --text3: #999;
-    --border: rgba(0,0,0,0.12);
-    --radius: 16px;
-    --radius-xl: 24px;
+    --bg: #f4f3ef; --surface: #fff; --surface2: #eceae4;
+    --border: rgba(0,0,0,0.09); --border2: rgba(0,0,0,0.16);
+    --text: #1c1b18; --text2: #6a6760; --text3: #aaa89f;
+    --blue: #1a72f5; --blue-bg: #e7f0fe; --blue-text: #1348b0;
+    --green: #15a347; --green-bg: #dbfce6; --green-text: #14783a;
+    --red: #d92626; --red-bg: #fde2e2; --red-text: #b41c1c;
+    --radius: 10px; --radius-lg: 14px;
   }
-
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17171a; --surface: #25252a; --surface2: #1c1c20;
+      --border: rgba(255,255,255,0.09); --border2: rgba(255,255,255,0.16);
+      --text: #f5f4f0; --text2: #9e9c96; --text3: #636059;
+      --blue-bg: #1b3868; --blue-text: #90bcf8;
+      --green-bg: #113025; --green-text: #7de8a0;
+      --red-bg: #3f0d0d; --red-text: #f99;
+    }
+  }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100dvh;
-    padding: 0 0 80px;
+    background: var(--bg); color: var(--text);
+    min-height: 100dvh; display: flex; justify-content: center;
+    padding: 1rem 1rem 5rem;
     -webkit-tap-highlight-color: transparent;
   }
+  .app { width: 100%; max-width: 540px; }
 
-  /* ── TOPO ── */
-  .topo {
-    background: var(--blue);
-    color: white;
-    padding: 20px 20px 16px;
-    padding-top: calc(20px + env(safe-area-inset-top, 0));
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-  .topo-icon {
-    width: 52px; height: 52px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 16px;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .topo h1 { font-size: 24px; font-weight: 800; line-height: 1.1; }
-  .topo p { font-size: 15px; opacity: .85; margin-top: 2px; }
+  .header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; padding-top: env(safe-area-inset-top, 0); }
+  .logo { width: 42px; height: 42px; border-radius: 12px; background: var(--blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .header h1 { font-size: 19px; font-weight: 700; }
+  .header p { font-size: 12px; color: var(--text2); margin-top: 1px; }
 
-  /* ── SEÇÕES ── */
-  .secao { padding: 20px; }
-  .secao + .secao { padding-top: 0; }
+  .steps { display: flex; margin-bottom: 1rem; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+  .step { flex: 1; padding: 9px 4px; text-align: center; font-size: 11px; font-weight: 600; color: var(--text3); background: var(--surface); border-right: 1px solid var(--border); transition: all .2s; }
+  .step:last-child { border-right: none; }
+  .step.active { background: var(--blue-bg); color: var(--blue-text); }
+  .step.done { background: var(--green-bg); color: var(--green-text); }
 
-  /* ── BOTÃO PRINCIPAL ── */
-  .btn-principal {
-    width: 100%;
-    padding: 22px 20px;
-    border-radius: var(--radius-xl);
-    border: none;
-    font-size: 22px;
-    font-weight: 800;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    touch-action: manipulation;
-    transition: transform .1s, opacity .1s;
-    line-height: 1.2;
-    text-align: left;
+  .setup-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.125rem; margin-bottom: 1rem; }
+  .setup-card h3 { font-size: 13px; font-weight: 700; margin-bottom: 5px; display: flex; align-items: center; gap: 7px; }
+  .setup-card .sub { font-size: 12px; color: var(--text2); margin-bottom: 10px; line-height: 1.65; }
+  .setup-card .sub a { color: var(--blue-text); }
+  .setup-row { display: flex; gap: 8px; }
+  .setup-row input {
+    flex: 1; padding: 10px 12px; border-radius: var(--radius);
+    border: 1px solid var(--border2); background: var(--bg);
+    color: var(--text); font-size: 13px; outline: none;
+    -webkit-appearance: none; font-family: monospace;
   }
-  .btn-principal:active { transform: scale(0.97); opacity: .85; }
-  .btn-principal.azul { background: var(--blue); color: white; }
-  .btn-principal.verde { background: var(--green); color: white; }
-  .btn-principal.cinza { background: #e0e0e0; color: var(--text); }
-  .btn-principal .icone { font-size: 34px; flex-shrink: 0; }
-  .btn-principal .txt { flex: 1; }
-  .btn-principal .sub { font-size: 15px; font-weight: 500; opacity: .85; display: block; margin-top: 2px; }
+  .setup-row input:focus { border-color: var(--blue); }
+  .setup-row input::placeholder { font-family: -apple-system, sans-serif; color: var(--text3); font-size: 13px; }
+  .save-btn { margin-top: 10px; width: 100%; padding: 12px; border-radius: var(--radius); border: none; background: var(--blue); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+  .save-btn:active { opacity: .8; }
+  .key-status { font-size: 12px; margin-top: 7px; }
+  .key-status.ok { color: var(--green-text); font-weight: 600; }
+  .key-status.err { color: var(--red-text); }
+  .key-status.info { color: var(--text2); }
 
-  /* ── BOTÃO SECUNDÁRIO ── */
-  .btn-sec {
-    width: 100%;
-    padding: 18px 20px;
-    border-radius: var(--radius);
-    border: 2px solid var(--border);
-    background: var(--surface);
-    font-size: 19px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    touch-action: manipulation;
-    color: var(--text);
-    transition: background .12s;
-    margin-bottom: 12px;
-  }
-  .btn-sec:active { background: #f0f0f0; }
-  .btn-sec .icone { font-size: 28px; }
-
-  /* ── TELA INICIAL ── */
-  #telaInicio { display: block; }
-  .descricao-app {
-    background: #fff8e1;
-    border-radius: var(--radius);
-    padding: 18px 20px;
-    font-size: 18px;
-    line-height: 1.6;
-    color: #5a4000;
-    margin-bottom: 20px;
-    border-left: 5px solid #f59e0b;
-  }
-  .descricao-app strong { font-weight: 800; }
-
-  /* ── TELA GUARDAR ── */
-  #telaGuardar { display: none; }
-
-  .passo-titulo {
-    font-size: 28px;
-    font-weight: 800;
-    margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .passo-desc {
-    font-size: 18px;
-    color: var(--text2);
-    margin-bottom: 20px;
-    line-height: 1.5;
-  }
-
-  .cam-box {
-    border-radius: var(--radius-xl);
-    overflow: hidden;
-    background: #222;
-    aspect-ratio: 4/3;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 16px;
-    width: 100%;
-  }
+  .cam-box { border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border); background: #111; aspect-ratio: 4/3; position: relative; display: flex; align-items: center; justify-content: center; margin-bottom: .9rem; width: 100%; }
   #video { width: 100%; height: 100%; object-fit: cover; display: none; }
   #canvas { display: none; }
-  .cam-ph {
-    text-align: center;
-    color: #aaa;
-    padding: 2rem;
-  }
-  .cam-ph .icon { font-size: 64px; display: block; margin-bottom: 10px; }
-  .cam-ph p { font-size: 18px; line-height: 1.5; }
+  .cam-ph { text-align: center; color: var(--text3); padding: 2rem; }
+  .cam-ph .icon { font-size: 48px; display: block; margin-bottom: 8px; }
+  .cam-ph p { font-size: 14px; line-height: 1.5; }
   .flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; transition: opacity .06s; }
-  .flash.on { opacity: .9; }
+  .flash.on { opacity: .8; }
 
-  /* Preview da foto tirada */
-  .foto-preview {
-    display: none;
-    border-radius: var(--radius-xl);
-    overflow: hidden;
-    margin-bottom: 16px;
-    position: relative;
-  }
-  .foto-preview img { width: 100%; display: block; border-radius: var(--radius-xl); }
-  .foto-preview .refazer {
-    position: absolute;
-    top: 12px; right: 12px;
-    background: rgba(0,0,0,0.6);
-    color: white;
-    border: none;
-    border-radius: 99px;
-    padding: 8px 16px;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    touch-action: manipulation;
-  }
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: .9rem; }
+  .btn { padding: 14px 6px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--surface); color: var(--text); font-size: 12px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; touch-action: manipulation; min-height: 64px; transition: opacity .1s; }
+  .btn:active:not(:disabled) { opacity: .6; transform: scale(0.96); }
+  .btn:disabled { opacity: .32; cursor: not-allowed; }
+  .btn.blue { background: var(--blue); color: #fff; border-color: transparent; }
+  .btn.rec { background: var(--red-bg); color: var(--red-text); border-color: transparent; animation: pulse 1.1s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--red); animation: pulse 1s ease-in-out infinite; }
 
-  /* Resultado da IA */
-  .resultado-ia {
-    background: var(--green-bg);
-    border-radius: var(--radius);
-    padding: 16px 18px;
-    margin-bottom: 16px;
-    display: none;
-  }
-  .resultado-ia.show { display: block; }
-  .resultado-ia .label { font-size: 15px; color: var(--green-text); font-weight: 700; margin-bottom: 4px; }
-  .resultado-ia .nome { font-size: 26px; font-weight: 800; color: var(--text); }
-  .resultado-ia.loading { display: flex; align-items: center; gap: 12px; background: #f0f0f0; }
-  .resultado-ia.loading .load-txt { font-size: 18px; color: var(--text2); }
-  .spinner { width: 28px; height: 28px; border: 3px solid #ddd; border-top-color: var(--blue); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+  .upload-label { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px; border-radius: var(--radius); border: 1px dashed var(--border2); background: var(--surface); color: var(--text2); font-size: 13px; cursor: pointer; margin-bottom: .9rem; font-weight: 500; touch-action: manipulation; }
+  .upload-label:active { background: var(--surface2); }
+  #fileInput { display: none; }
+
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.125rem; margin-bottom: .9rem; }
+  .plabel { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); margin-bottom: 7px; }
+  .voice-out { font-size: 16px; color: var(--text); min-height: 24px; line-height: 1.5; }
+  .voice-out.empty { color: var(--text3); font-style: italic; font-size: 14px; }
+
+  .ai-out { font-size: 14px; color: var(--text); line-height: 1.65; min-height: 36px; }
+  .ai-out.loading { color: var(--text2); display: flex; align-items: center; gap: 9px; }
+  .spinner { width: 15px; height: 15px; border: 2px solid var(--border2); border-top-color: var(--blue); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
+  .obj-name { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .obj-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+  .tag { display: inline-flex; align-items: center; background: var(--blue-bg); color: var(--blue-text); font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 99px; }
+  .obj-desc { font-size: 13px; color: var(--text2); line-height: 1.55; }
 
-  /* Gravação de voz */
-  .voz-resultado {
-    background: #e8f0fe;
-    border-radius: var(--radius);
-    padding: 16px 18px;
-    margin-bottom: 16px;
-    display: none;
-  }
-  .voz-resultado.show { display: block; }
-  .voz-resultado .label { font-size: 15px; color: #1348b0; font-weight: 700; margin-bottom: 4px; }
-  .voz-resultado .local { font-size: 22px; font-weight: 800; color: var(--text); }
+  .lh { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
+  .lt { font-size: 14px; font-weight: 700; }
+  .lc { font-size: 12px; color: var(--text3); }
+  .search-wrap { position: relative; margin-bottom: 9px; }
+  .search-wrap svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text3); pointer-events: none; }
+  .search-wrap input { width: 100%; padding: 11px 12px 11px 34px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--surface); color: var(--text); font-size: 14px; outline: none; -webkit-appearance: none; }
+  .items { display: flex; flex-direction: column; gap: 8px; }
+  .empty { text-align: center; color: var(--text3); font-size: 13px; line-height: 1.6; padding: 2rem; background: var(--surface); border-radius: var(--radius-lg); border: 1px dashed var(--border2); }
+  .card { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 11px 12px; animation: fadeIn .22s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+  .thumb { width: 58px; height: 58px; border-radius: 9px; object-fit: cover; flex-shrink: 0; border: 1px solid var(--border); background: var(--surface2); }
+  .ci { flex: 1; min-width: 0; }
+  .cn { font-size: 15px; font-weight: 700; }
+  .ctags { display: flex; flex-wrap: wrap; gap: 3px; margin: 3px 0; }
+  .ctag { font-size: 10px; background: var(--surface2); color: var(--text2); padding: 2px 7px; border-radius: 99px; border: 1px solid var(--border); }
+  .cl { font-size: 13px; color: var(--text2); display: flex; align-items: center; gap: 4px; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ct { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .del { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 18px; padding: 8px; border-radius: 6px; flex-shrink: 0; line-height: 1; touch-action: manipulation; }
+  .del:active { color: var(--red); }
 
-  .btn-gravar {
-    width: 100%; padding: 22px; border-radius: var(--radius-xl);
-    border: none; font-size: 22px; font-weight: 800;
-    cursor: pointer; display: flex; align-items: center;
-    justify-content: center; gap: 14px; touch-action: manipulation;
-    margin-bottom: 12px; transition: transform .1s;
-  }
-  .btn-gravar:active { transform: scale(0.97); }
-  .btn-gravar.espera { background: #e0e0e0; color: var(--text); }
-  .btn-gravar.gravando { background: var(--red); color: white; animation: pulse 1.2s ease-in-out infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
-  .btn-gravar:disabled { opacity: .35; cursor: not-allowed; animation: none; }
-  .dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: white; animation: pulse 1s ease-in-out infinite; }
-
-  /* ── TELA BUSCAR ── */
-  #telaBuscar { display: none; }
-
-  .busca-input-wrap { position: relative; margin-bottom: 16px; }
-  .busca-input {
-    width: 100%; padding: 18px 18px 18px 54px;
-    border-radius: var(--radius); border: 2px solid var(--border);
-    background: var(--surface); color: var(--text);
-    font-size: 20px; outline: none; -webkit-appearance: none;
-    font-weight: 600;
-  }
-  .busca-input:focus { border-color: var(--blue); }
-  .busca-input::placeholder { color: var(--text3); font-weight: 400; }
-  .busca-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 24px; }
-
-  .card {
-    background: var(--surface);
-    border-radius: var(--radius);
-    padding: 16px;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    border: 1.5px solid var(--border);
-  }
-  .thumb {
-    width: 72px; height: 72px;
-    border-radius: 12px; object-fit: cover;
-    flex-shrink: 0; background: #eee;
-    border: 1px solid var(--border);
-  }
-  .card-info { flex: 1; min-width: 0; }
-  .card-nome { font-size: 20px; font-weight: 800; }
-  .card-local { font-size: 18px; color: var(--text2); margin-top: 3px; display: flex; align-items: center; gap: 5px; }
-  .card-data { font-size: 14px; color: var(--text3); margin-top: 4px; }
-  .card-del { background: none; border: none; font-size: 22px; padding: 10px; cursor: pointer; color: var(--text3); flex-shrink: 0; touch-action: manipulation; }
-  .card-del:active { color: var(--red); }
-
-  .lista-vazia { text-align: center; padding: 40px 20px; color: var(--text2); }
-  .lista-vazia .icon { font-size: 56px; display: block; margin-bottom: 12px; }
-  .lista-vazia p { font-size: 20px; line-height: 1.5; }
-
-  /* ── TELA CONFIG ── */
-  #telaConfig { display: none; }
-
-  .config-bloco {
-    background: var(--surface);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 16px;
-    border: 1.5px solid var(--border);
-  }
-  .config-bloco h3 { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
-  .config-bloco p { font-size: 16px; color: var(--text2); margin-bottom: 14px; line-height: 1.5; }
-  .config-input {
-    width: 100%; padding: 14px 16px;
-    border-radius: var(--radius); border: 2px solid var(--border);
-    background: var(--bg); color: var(--text);
-    font-size: 16px; outline: none; -webkit-appearance: none;
-    font-family: monospace; margin-bottom: 10px;
-  }
-  .config-input:focus { border-color: var(--blue); }
-  .config-btn {
-    width: 100%; padding: 14px;
-    border-radius: var(--radius); border: none;
-    background: var(--blue); color: white;
-    font-size: 18px; font-weight: 800;
-    cursor: pointer; touch-action: manipulation;
-  }
-  .config-btn:active { opacity: .8; }
-  .config-status { font-size: 15px; margin-top: 8px; color: var(--text2); }
-  .config-status.ok { color: var(--green); font-weight: 700; }
-
-  .notif-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-  .notif-label { font-size: 18px; font-weight: 700; }
-  .toggle { position: relative; width: 56px; height: 30px; flex-shrink: 0; }
-  .toggle input { opacity: 0; width: 0; height: 0; }
-  .toggle-slider { position: absolute; inset: 0; background: #ccc; border-radius: 99px; cursor: pointer; transition: background .2s; }
-  .toggle-slider:before { content: ''; position: absolute; width: 22px; height: 22px; left: 4px; top: 4px; background: white; border-radius: 50%; transition: transform .2s; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
-  .toggle input:checked + .toggle-slider { background: var(--blue); }
-  .toggle input:checked + .toggle-slider:before { transform: translateX(26px); }
-  .time-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
-  .time-chip {
-    padding: 10px 16px; border-radius: 99px;
-    border: 2px solid var(--border); background: var(--surface);
-    color: var(--text2); font-size: 17px; font-weight: 700;
-    cursor: pointer; touch-action: manipulation; transition: all .15s;
-  }
-  .time-chip.ativo { background: var(--blue); color: white; border-color: transparent; }
-
-  /* ── NAV INFERIOR ── */
-  .nav {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: white;
-    border-top: 1.5px solid var(--border);
-    display: flex;
-    padding-bottom: env(safe-area-inset-bottom, 0);
-    z-index: 100;
-  }
-  .nav-btn {
-    flex: 1; padding: 12px 8px 10px;
-    border: none; background: none;
-    cursor: pointer; display: flex;
-    flex-direction: column; align-items: center; gap: 4px;
-    touch-action: manipulation; color: var(--text3);
-    font-size: 12px; font-weight: 600;
-    transition: color .15s;
-  }
-  .nav-btn .nav-icon { font-size: 26px; }
-  .nav-btn.ativo { color: var(--blue); }
-
-  /* ── TOAST ── */
-  #toast {
-    position: fixed; bottom: calc(80px + env(safe-area-inset-bottom, 0px));
-    left: 50%; transform: translateX(-50%) translateY(80px);
-    background: #1a1a1a; color: white;
-    padding: 14px 24px; border-radius: 99px;
-    font-size: 17px; font-weight: 700;
-    transition: transform .25s ease, opacity .25s ease;
-    opacity: 0; z-index: 999; pointer-events: none;
-    max-width: 90vw; text-align: center;
-  }
+  #toast { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); color: var(--bg); padding: 12px 22px; border-radius: 99px; font-size: 13px; font-weight: 600; transition: transform .25s ease, opacity .25s ease; opacity: 0; z-index: 999; pointer-events: none; max-width: 88vw; text-align: center; white-space: pre-wrap; }
   #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-  /* ── LEMBRETE ── */
-  .lembrete {
-    background: #fff3cd;
-    border-radius: var(--radius);
-    padding: 18px 20px;
-    margin-bottom: 20px;
-    display: none;
-    align-items: flex-start;
-    gap: 12px;
-    border-left: 5px solid #f59e0b;
-  }
-  .lembrete.show { display: flex; }
-  .lembrete .lem-txt { flex: 1; }
-  .lembrete .lem-titulo { font-size: 18px; font-weight: 800; color: #78350f; }
-  .lembrete .lem-desc { font-size: 16px; color: #92400e; margin-top: 3px; line-height: 1.4; }
-  .lembrete .lem-fechar { background: none; border: none; font-size: 22px; cursor: pointer; color: #92400e; padding: 0 0 0 8px; flex-shrink: 0; }
-
-  .divisor { height: 1px; background: var(--border); margin: 0 20px 20px; }
-
-  /* Salvo com sucesso */
-  .sucesso-card {
-    display: none;
-    background: var(--green-bg);
-    border-radius: var(--radius-xl);
-    padding: 28px 24px;
-    text-align: center;
-    margin-bottom: 20px;
-    border: 2px solid #b7f0cd;
-  }
-  .sucesso-card.show { display: block; }
-  .sucesso-card .icon { font-size: 56px; display: block; margin-bottom: 10px; }
-  .sucesso-card h2 { font-size: 26px; font-weight: 800; color: var(--green-text); margin-bottom: 6px; }
-  .sucesso-card p { font-size: 18px; color: var(--green-text); line-height: 1.5; }
 </style>
 </head>
 <body>
 <div id="toast"></div>
+<div class="app">
 
-<!-- Topo fixo -->
-<div class="topo">
-  <div class="topo-icon">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
-    </svg>
-  </div>
-  <div>
-    <h1>Onde Guardei?</h1>
-    <p id="topoSub">Seu ajudante de memória</p>
-  </div>
-</div>
-
-<!-- ════ TELA INÍCIO ════ -->
-<div id="telaInicio">
-  <div class="secao">
-
-    <!-- Lembrete ao reabrir -->
-    <div class="lembrete" id="lembreteReabrir">
-      <span style="font-size:28px">🔔</span>
-      <div class="lem-txt">
-        <div class="lem-titulo">Guardou algo recentemente?</div>
-        <div class="lem-desc">Registre agora para não esquecer onde está!</div>
-      </div>
-      <button class="lem-fechar" onclick="fecharLembrete()">✕</button>
+  <div class="header">
+    <div class="logo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+      </svg>
     </div>
-
-    <div class="descricao-app">
-      <strong>Como funciona:</strong><br>
-      1️⃣ Tire uma foto do objeto<br>
-      2️⃣ Fale onde está guardando<br>
-      3️⃣ Pronto! Sempre que esquecer, é só buscar aqui 🔍
+    <div>
+      <h1>Onde Guardei?</h1>
+      <p>Foto + voz · Gemini Vision · 100% grátis</p>
     </div>
+  </div>
 
-    <button class="btn-principal azul" onclick="irParaGuardar()" style="margin-bottom:16px">
-      <span class="icone">📦</span>
-      <span class="txt">
-        Guardar um objeto
-        <span class="sub">Tire uma foto e diga onde vai guardar</span>
-      </span>
+  <div class="steps">
+    <div class="step active" id="s1">1 · Câmera</div>
+    <div class="step" id="s2">2 · Foto</div>
+    <div class="step" id="s3">3 · Voz</div>
+    <div class="step" id="s4">✓ Salvo</div>
+  </div>
+
+  <!-- Setup -->
+  <div class="setup-card">
+    <h3>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Google Gemini Vision — <span style="color:var(--green-text)">1.500 req/dia grátis</span>
+    </h3>
+    <div class="sub">
+      1. Acesse <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a><br>
+      2. Clique em <strong>Get API key</strong> → <strong>Create API key</strong><br>
+      3. Cole a key abaixo (começa com <code>AIza...</code>)
+    </div>
+    <div class="setup-row">
+      <input type="password" id="apiKey" placeholder="AIzaSy..." autocomplete="off" />
+      <button class="save-btn" style="margin:0;width:auto;padding:10px 16px;font-size:13px" onclick="saveKey()">Salvar</button>
+    </div>
+    <div class="key-status info" id="keyStatus">Aguardando API key do Google AI Studio...</div>
+  </div>
+
+  <!-- Camera -->
+  <div class="cam-box">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+    <div class="cam-ph" id="camPh">
+      <span class="icon">📷</span>
+      <p>Câmera desligada</p>
+    </div>
+    <div class="flash" id="flash"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" id="btnCam" onclick="toggleCamera()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      Ligar câmera
     </button>
-
-    <button class="btn-principal verde" onclick="irParaBuscar()">
-      <span class="icone">🔍</span>
-      <span class="txt">
-        Onde está meu objeto?
-        <span class="sub">Busque pelo nome do objeto</span>
-      </span>
+    <button class="btn blue" id="btnSnap" onclick="takePhoto()" disabled>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M20.94 11A9 9 0 1 0 12 21"/></svg>
+      Tirar foto
     </button>
-
+    <button class="btn" id="btnVoice" onclick="toggleVoice()" disabled>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      Falar local
+    </button>
   </div>
-</div>
 
-<!-- ════ TELA GUARDAR ════ -->
-<div id="telaGuardar">
-  <div class="secao">
+  <label class="upload-label" for="fileInput">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+    Ou escolha uma foto da galeria
+  </label>
+  <input type="file" id="fileInput" accept="image/*" onchange="handleFile(event)" />
 
-    <!-- Sucesso -->
-    <div class="sucesso-card" id="sucessoCard">
-      <span class="icon">✅</span>
-      <h2>Registrado com sucesso!</h2>
-      <p id="sucessoTexto">Objeto salvo.</p>
-    </div>
-
-    <!-- Passo 1: Foto -->
-    <div id="passo1">
-      <div class="passo-titulo">📷 Passo 1 de 2</div>
-      <div class="passo-desc">Tire uma foto do objeto que vai guardar</div>
-
-      <div class="cam-box" id="camBox">
-        <video id="video" autoplay playsinline muted></video>
-        <canvas id="canvas"></canvas>
-        <div class="cam-ph" id="camPh">
-          <span class="icon">📷</span>
-          <p>Toque em "Ligar câmera"<br>para começar</p>
-        </div>
-        <div class="flash" id="flash"></div>
-      </div>
-
-      <div class="foto-preview" id="fotoPreview">
-        <img id="fotoImg" src="" alt="Foto tirada" />
-        <button class="refazer" onclick="refazerFoto()">🔄 Refazer</button>
-      </div>
-
-      <div class="resultado-ia" id="resultadoIA">
-        <div class="label">Objeto identificado:</div>
-        <div class="nome" id="nomeObjeto">—</div>
-      </div>
-
-      <button class="btn-principal azul" id="btnCam" onclick="toggleCamera()" style="margin-bottom:12px">
-        <span class="icone">📷</span>
-        <span class="txt">
-          Ligar câmera
-          <span class="sub">Aponte para o objeto</span>
-        </span>
-      </button>
-
-      <button class="btn-principal cinza" id="btnFoto" onclick="tirarFoto()" disabled style="margin-bottom:12px">
-        <span class="icone">🟢</span>
-        <span class="txt">
-          Tirar foto
-          <span class="sub">Toque aqui quando estiver pronto</span>
-        </span>
-      </button>
-
-      <label class="btn-sec" for="fileInput">
-        <span class="icone">🖼️</span>
-        Ou escolha da galeria
-      </label>
-      <input type="file" id="fileInput" accept="image/*" onchange="handleFile(event)" style="display:none" />
-    </div>
-
-    <!-- Passo 2: Voz -->
-    <div id="passo2" style="display:none">
-      <div class="passo-titulo">🎙️ Passo 2 de 2</div>
-      <div class="passo-desc">Fale onde vai guardar o objeto<br><strong>Exemplo: "gaveta da cozinha"</strong></div>
-
-      <div class="resultado-ia show" style="margin-bottom:16px">
-        <div class="label">Objeto identificado:</div>
-        <div class="nome" id="nomeObjetoPasso2">—</div>
-      </div>
-
-      <div class="voz-resultado" id="vozResultado">
-        <div class="label">Você disse:</div>
-        <div class="local" id="vozTexto">—</div>
-      </div>
-
-      <button class="btn-gravar espera" id="btnGravar" onclick="toggleVoice()">
-        <span style="font-size:32px">🎙️</span>
-        Toque para falar o local
-      </button>
-
-      <button class="btn-sec" id="btnSalvar" onclick="salvarItem()" style="display:none;background:#e6f9ee;border-color:#b7f0cd">
-        <span class="icone">✅</span>
-        <strong style="color:var(--green)">Confirmar e salvar</strong>
-      </button>
-
-      <button class="btn-sec" onclick="voltarPasso1()" style="margin-top:4px">
-        <span class="icone">⬅️</span>
-        Voltar e tirar outra foto
-      </button>
-    </div>
-
+  <div class="panel">
+    <div class="plabel">Você disse</div>
+    <div class="voice-out empty" id="voiceOut">Aguardando gravação...</div>
   </div>
-</div>
 
-<!-- ════ TELA BUSCAR ════ -->
-<div id="telaBuscar">
-  <div class="secao">
-    <div class="passo-titulo" style="margin-bottom:6px">🔍 Onde está?</div>
-    <div class="passo-desc">Digite o nome do objeto que está procurando</div>
-
-    <div class="busca-input-wrap">
-      <span class="busca-icon">🔍</span>
-      <input class="busca-input" type="text" id="buscaInput" placeholder="Ex: chave, óculos, carteira..." oninput="renderBusca()" />
-    </div>
-
-    <div id="listaItens"></div>
+  <div class="panel">
+    <div class="plabel">Análise do Gemini Vision</div>
+    <div class="ai-out" id="aiOut" style="color:var(--text3);font-size:14px">Tire uma foto para identificar os objetos.</div>
   </div>
-</div>
 
-<!-- ════ TELA CONFIG ════ -->
-<div id="telaConfig">
-  <div class="secao">
-    <div class="passo-titulo" style="margin-bottom:16px">⚙️ Configurações</div>
-
-    <!-- API Key -->
-    <div class="config-bloco">
-      <h3>🤖 Identificação automática</h3>
-      <p>Cole aqui a sua chave do Google AI Studio para o app reconhecer os objetos automaticamente nas fotos.</p>
-      <input class="config-input" type="password" id="apiKey" placeholder="AIzaSy..." autocomplete="off" />
-      <button class="config-btn" onclick="salvarKey()">Salvar chave</button>
-      <div class="config-status" id="keyStatus">Aguardando chave...</div>
-    </div>
-
-    <!-- Notificações -->
-    <div class="config-bloco">
-      <h3>🔔 Lembretes diários</h3>
-      <p>Receba um lembrete no celular para não esquecer de registrar objetos.</p>
-      <div class="notif-row">
-        <span class="notif-label">Ativar lembretes</span>
-        <label class="toggle">
-          <input type="checkbox" id="notifToggle" onchange="toggleNotif()" />
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-      <div id="timePicker" style="display:none">
-        <div style="font-size:16px;color:var(--text2);margin-bottom:8px">Escolha os horários:</div>
-        <div class="time-chips">
-          <div class="time-chip" data-h="8" onclick="toggleHorario(this)">08:00</div>
-          <div class="time-chip" data-h="12" onclick="toggleHorario(this)">12:00</div>
-          <div class="time-chip" data-h="18" onclick="toggleHorario(this)">18:00</div>
-          <div class="time-chip" data-h="21" onclick="toggleHorario(this)">21:00</div>
-        </div>
-      </div>
-      <div class="config-status" id="notifStatus">Ative para receber lembretes.</div>
-    </div>
-
-    <!-- Instalar -->
-    <div class="config-bloco">
-      <h3>📱 Instalar no celular</h3>
-      <p>Adicione o app na tela inicial do seu celular para abrir com um toque, igual a um aplicativo normal.</p>
-      <button class="config-btn" onclick="instalarApp()">Adicionar à tela inicial</button>
-    </div>
-
+  <div class="lh">
+    <span class="lt">Registrados</span>
+    <span class="lc" id="lcount">0 itens</span>
   </div>
+  <div class="search-wrap">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search" placeholder="Buscar objeto ou local..." oninput="render()" />
+  </div>
+  <div class="items" id="items">
+    <div class="empty">Nenhum objeto registrado ainda.</div>
+  </div>
+
 </div>
-
-<!-- Nav inferior -->
-<nav class="nav">
-  <button class="nav-btn ativo" id="nav-inicio" onclick="irPara('inicio')">
-    <span class="nav-icon">🏠</span>
-    Início
-  </button>
-  <button class="nav-btn" id="nav-guardar" onclick="irPara('guardar')">
-    <span class="nav-icon">📦</span>
-    Guardar
-  </button>
-  <button class="nav-btn" id="nav-buscar" onclick="irPara('buscar')">
-    <span class="nav-icon">🔍</span>
-    Buscar
-  </button>
-  <button class="nav-btn" id="nav-config" onclick="irPara('config')">
-    <span class="nav-icon">⚙️</span>
-    Config
-  </button>
-</nav>
-
 <script>
-// ── Estado ──
+// ── State ──
 let stream = null, cameraOn = false;
 let photoData = null, photoThumb = null;
-let pendingName = null;
+let pendingName = null, pendingTags = [], pendingDesc = '';
 let voiceText = '', isRec = false, recog = null;
 let items = [];
 let apiKey = '';
-let notifTimes = [];
-let deferredInstall = null;
-let telaAtual = 'inicio';
 
 try { items = JSON.parse(localStorage.getItem('ong_items') || '[]'); } catch(e) {}
-try { apiKey = localStorage.getItem('ong_key') || ''; } catch(e) {}
-try { notifTimes = JSON.parse(localStorage.getItem('ong_notif_times') || '[]'); } catch(e) {}
+try { apiKey = localStorage.getItem('ong_gemini_key') || ''; } catch(e) {}
 
-// Inicializa
 if (apiKey) {
-  document.getElementById('keyStatus').className = 'config-status ok';
-  document.getElementById('keyStatus').textContent = '✓ Chave salva e pronta!';
-  document.getElementById('apiKey').placeholder = 'Chave salva ✓';
+  document.getElementById('keyStatus').className = 'key-status ok';
+  document.getElementById('keyStatus').textContent = '✓ API key salva e pronta!';
 }
-if (notifTimes.length > 0) {
-  document.getElementById('notifToggle').checked = true;
-  document.getElementById('timePicker').style.display = 'block';
-  notifTimes.forEach(h => {
-    const chip = document.querySelector(`.time-chip[data-h="${h}"]`);
-    if (chip) chip.classList.add('ativo');
-  });
-  updateNotifStatus();
-  notifTimes.forEach(h => agendarNotif(h));
-}
+render();
 
-renderBusca();
-verificarLembrete();
-setupPWA();
-
-// ════════════════════════════════════════════════
-//  NAVEGAÇÃO
-// ════════════════════════════════════════════════
-function irPara(tela) {
-  ['inicio','guardar','buscar','config'].forEach(t => {
-    document.getElementById('tela' + t.charAt(0).toUpperCase() + t.slice(1)).style.display = 'none';
-    document.getElementById('nav-' + t).classList.remove('ativo');
-  });
-  document.getElementById('tela' + tela.charAt(0).toUpperCase() + tela.slice(1)).style.display = 'block';
-  document.getElementById('nav-' + tela).classList.add('ativo');
-  telaAtual = tela;
-
-  const subs = { inicio: 'Seu ajudante de memória', guardar: 'Registrar um objeto', buscar: 'Encontrar um objeto', config: 'Configurações' };
-  document.getElementById('topoSub').textContent = subs[tela];
-
-  if (tela === 'buscar') renderBusca();
-  window.scrollTo(0, 0);
+// ── API Key ──
+function saveKey() {
+  const v = document.getElementById('apiKey').value.trim();
+  if (!v) { toast('Cole a API key primeiro', 'warn'); return; }
+  if (!v.startsWith('AIza')) { toast('Key inválida — deve começar com AIza', 'error'); return; }
+  apiKey = v;
+  try { localStorage.setItem('ong_gemini_key', v); } catch(e) {}
+  document.getElementById('apiKey').value = '';
+  document.getElementById('apiKey').placeholder = 'API key salva ✓';
+  document.getElementById('keyStatus').className = 'key-status ok';
+  document.getElementById('keyStatus').textContent = '✓ API key salva! Pode tirar fotos.';
+  toast('✓ API key salva!', 'success');
 }
 
-function irParaGuardar() { irPara('guardar'); }
-function irParaBuscar() { irPara('buscar'); }
-
-// ════════════════════════════════════════════════
-//  PASSOS DE GUARDAR
-// ════════════════════════════════════════════════
-function voltarPasso1() {
-  document.getElementById('passo1').style.display = 'block';
-  document.getElementById('passo2').style.display = 'none';
-  document.getElementById('sucessoCard').classList.remove('show');
-  document.getElementById('vozResultado').classList.remove('show');
-  document.getElementById('btnSalvar').style.display = 'none';
-  document.getElementById('btnGravar').className = 'btn-gravar espera';
-  document.getElementById('btnGravar').innerHTML = '<span style="font-size:32px">🎙️</span> Toque para falar o local';
-  voiceText = '';
+// ── Steps ──
+function step(n) {
+  for (let i = 1; i <= 4; i++)
+    document.getElementById('s'+i).className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
 }
 
-function irParaPasso2() {
-  document.getElementById('passo1').style.display = 'none';
-  document.getElementById('passo2').style.display = 'block';
-  document.getElementById('nomeObjetoPasso2').textContent = pendingName || 'objeto';
-  window.scrollTo(0, 0);
-}
-
-// ════════════════════════════════════════════════
-//  CÂMERA
-// ════════════════════════════════════════════════
+// ── Camera ──
 async function toggleCamera() {
-  if (cameraOn) { pararCam(); return; }
+  if (cameraOn) { stopCam(); return; }
   try {
     let s;
     try { s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 } }, audio: false }); }
@@ -713,46 +274,35 @@ async function toggleCamera() {
     v.srcObject = stream; await v.play();
     v.style.display = 'block';
     document.getElementById('camPh').style.display = 'none';
-    document.getElementById('fotoPreview').style.display = 'none';
     cameraOn = true;
-    document.getElementById('btnCam').innerHTML = '<span class="icone">⏹️</span><span class="txt">Desligar câmera<span class="sub">Toque para desligar</span></span>';
-    document.getElementById('btnFoto').disabled = false;
-    document.getElementById('btnFoto').className = 'btn-principal azul';
+    document.getElementById('btnCam').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"/><path d="M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34"/></svg>Desligar`;
+    document.getElementById('btnSnap').disabled = false;
+    step(1);
   } catch(e) {
-    toast(e.name === 'NotAllowedError' ? 'Permissão negada.\nUse "Ou escolha da galeria" abaixo.' : 'Erro: ' + e.message);
+    toast(e.name === 'NotAllowedError'
+      ? 'Permissão negada.\nUse "Escolher foto" abaixo como alternativa.'
+      : 'Erro: ' + e.message, 'error');
   }
 }
 
-function pararCam() {
+function stopCam() {
   if (stream) stream.getTracks().forEach(t => t.stop());
   document.getElementById('video').style.display = 'none';
-  document.getElementById('camPh').style.display = 'block';
+  document.getElementById('camPh').style.display = 'flex';
   cameraOn = false; stream = null;
-  document.getElementById('btnCam').innerHTML = '<span class="icone">📷</span><span class="txt">Ligar câmera<span class="sub">Aponte para o objeto</span></span>';
-  document.getElementById('btnFoto').disabled = true;
-  document.getElementById('btnFoto').className = 'btn-principal cinza';
+  document.getElementById('btnCam').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>Ligar câmera`;
+  document.getElementById('btnSnap').disabled = true;
 }
 
-function tirarFoto() {
+// ── Photo ──
+function takePhoto() {
   const v = document.getElementById('video');
   const c = document.getElementById('canvas');
   c.width = v.videoWidth || 1280; c.height = v.videoHeight || 960;
   c.getContext('2d').drawImage(v, 0, 0);
-  document.getElementById('flash').classList.add('on');
-  setTimeout(() => document.getElementById('flash').classList.remove('on'), 160);
-  processarCanvas(c);
-  pararCam();
-}
-
-function refazerFoto() {
-  document.getElementById('fotoPreview').style.display = 'none';
-  document.getElementById('resultadoIA').classList.remove('show');
-  document.getElementById('resultadoIA').className = 'resultado-ia';
-  photoData = null; photoThumb = null; pendingName = null;
-  document.getElementById('btnCam').innerHTML = '<span class="icone">📷</span><span class="txt">Ligar câmera<span class="sub">Aponte para o objeto</span></span>';
-  document.getElementById('btnFoto').disabled = true;
-  document.getElementById('btnFoto').className = 'btn-principal cinza';
-  document.getElementById('camPh').style.display = 'block';
+  const fl = document.getElementById('flash');
+  fl.classList.add('on'); setTimeout(() => fl.classList.remove('on'), 160);
+  processCanvas(c);
 }
 
 function handleFile(e) {
@@ -766,117 +316,138 @@ function handleFile(e) {
       if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
       c.width = w; c.height = h;
       c.getContext('2d').drawImage(img, 0, 0, w, h);
-      processarCanvas(c);
+      processCanvas(c);
     };
     img.src = ev.target.result;
   };
   reader.readAsDataURL(file); e.target.value = '';
 }
 
-function processarCanvas(c) {
-  // Thumb para exibição
+function processCanvas(c) {
   const tc = document.createElement('canvas');
-  tc.width = 160; tc.height = 120;
-  tc.getContext('2d').drawImage(c, 0, 0, 160, 120);
-  photoThumb = tc.toDataURL('image/jpeg', 0.75);
+  tc.width = 120; tc.height = 90;
+  tc.getContext('2d').drawImage(c, 0, 0, 120, 90);
+  photoThumb = tc.toDataURL('image/jpeg', 0.7);
   photoData = c.toDataURL('image/jpeg', 0.85).split(',')[1];
-
-  // Mostra preview
-  document.getElementById('fotoImg').src = photoThumb;
-  document.getElementById('fotoPreview').style.display = 'block';
-  document.getElementById('camBox').style.display = 'none';
-  document.getElementById('btnCam').style.display = 'none';
-  document.getElementById('btnFoto').style.display = 'none';
-
-  analisarImagem();
+  pendingName = null; pendingTags = []; pendingDesc = ''; voiceText = '';
+  document.getElementById('voiceOut').className = 'voice-out empty';
+  document.getElementById('voiceOut').textContent = 'Aguardando gravação...';
+  document.getElementById('btnVoice').disabled = false;
+  step(2);
+  analyzeImage();
 }
 
-// ════════════════════════════════════════════════
-//  GEMINI VISION
-// ════════════════════════════════════════════════
-async function analisarImagem() {
-  const el = document.getElementById('resultadoIA');
-  el.className = 'resultado-ia loading show';
-  el.innerHTML = '<div class="spinner"></div><span class="load-txt">Identificando o objeto...</span>';
+// ═══════════════════════════════════════════════════════════
+//  GOOGLE GEMINI VISION API
+//  Modelo: gemini-1.5-flash
+//  Endpoint: generativelanguage.googleapis.com
+//  Free tier: 1.500 req/dia — sem cartão — sem CORS
+//  Responde em português diretamente!
+// ═══════════════════════════════════════════════════════════
+async function analyzeImage() {
+  const out = document.getElementById('aiOut');
+  out.className = 'ai-out loading';
+  out.innerHTML = '<div class="spinner"></div> Analisando com Gemini...';
 
   if (!apiKey) {
-    el.className = 'resultado-ia show';
-    el.innerHTML = '<div class="label">Objeto:</div><div class="nome">Não identificado automaticamente</div>';
-    pendingName = 'objeto';
-    mostrarBotaoAvancar();
-    return;
+    out.className = 'ai-out';
+    out.style.color = 'var(--text3)';
+    out.textContent = 'Adicione sua API key do Google AI Studio para identificar objetos.';
+    pendingName = 'objeto'; pendingTags = []; pendingDesc = '';
+    step(3); return;
   }
 
   const prompt = `Analise esta imagem e me diga apenas o nome do objeto principal que você vê.
 Responda SOMENTE com o nome do objeto, sem pontuação, sem explicações, sem JSON.
-Seja específico: prefira 'tênis branco' a apenas 'sapato'.
+Seja específico: prefira 'tênis branco' a apenas 'sapato', 'notebook Dell' a apenas 'computador'.
 Use português do Brasil. Máximo 4 palavras.`;
 
   try {
-    const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
-    let data = null, lastError = '';
+    // Tenta modelos em sequência até um funcionar
+    const models = [
+      'gemini-2.5-flash',
+      'gemini-2.0-flash',
+      'gemini-2.0-flash-lite',
+    ];
+
+    let data = null;
+    let lastError = '';
     for (const model of models) {
       const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-        { method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: 'image/jpeg', data: photoData } }] }], generationConfig: { temperature: 0.1, maxOutputTokens: 50 } }) }
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                { text: prompt },
+                { inline_data: { mime_type: 'image/jpeg', data: photoData } }
+              ]
+            }],
+            generationConfig: { temperature: 0.1, maxOutputTokens: 300 }
+          })
+        }
       );
       const json = await res.json();
       if (!res.ok || json.error) {
         lastError = json.error?.message || `HTTP ${res.status}`;
-        if (lastError.includes('quota') || lastError.includes('Quota') || lastError.includes('not found') || res.status === 429) continue;
+        // Se for quota, tenta próximo modelo
+        if (lastError.includes('quota') || lastError.includes('Quota') || res.status === 429) continue;
+        // Outro erro — lança imediatamente
         throw new Error(lastError);
       }
-      data = json; break;
+      data = json;
+      break;
     }
-    if (!data) throw new Error('Tente novamente em alguns minutos.');
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    pendingName = text.replace(/```json|```|[*#_\-\.,"'`]/g, '').trim() || 'objeto';
+
+    if (!data) throw new Error('Cota esgotada em todos os modelos. Tente novamente em alguns minutos.');
+
+    let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    // Remove markdown se vier
+    text = text.replace(/```json|```/g, '').trim();
+
+    // Gemini agora responde só com o nome — limpa qualquer pontuação ou espaço extra
+    const name = text.replace(/[*#_\-\.,"'`]/g, '').trim();
+    if (!name) throw new Error('Não foi possível identificar o objeto.');
+
+    pendingName = name;
+    pendingTags = [];
+    pendingDesc = '';
+
+    out.className = 'ai-out';
+    out.innerHTML = `<div class="obj-name">${pendingName}</div>`;
+    step(3);
+    toast('Objeto identificado!\nDiga onde vai guardar.', 'success');
+
   } catch(e) {
-    pendingName = 'objeto';
-  }
-
-  el.className = 'resultado-ia show';
-  el.innerHTML = `<div class="label">✅ Objeto identificado:</div><div class="nome">${pendingName}</div>`;
-  document.getElementById('nomeObjeto').textContent = pendingName;
-  mostrarBotaoAvancar();
-}
-
-function mostrarBotaoAvancar() {
-  // Substitui botões por botão de avançar
-  document.getElementById('btnCam').style.display = 'none';
-  document.getElementById('btnFoto').style.display = 'none';
-  // Adiciona botão avançar se não existir
-  if (!document.getElementById('btnAvancar')) {
-    const btn = document.createElement('button');
-    btn.id = 'btnAvancar';
-    btn.className = 'btn-principal verde';
-    btn.style.marginBottom = '12px';
-    btn.innerHTML = '<span class="icone">➡️</span><span class="txt">Continuar<span class="sub">Agora diga onde vai guardar</span></span>';
-    btn.onclick = irParaPasso2;
-    document.getElementById('passo1').appendChild(btn);
-  } else {
-    document.getElementById('btnAvancar').style.display = 'flex';
+    out.className = 'ai-out';
+    out.style.color = 'var(--red-text)';
+    out.textContent = '⚠ ' + e.message;
+    pendingName = 'objeto'; pendingTags = []; pendingDesc = '';
+    step(3);
   }
 }
 
-// ════════════════════════════════════════════════
-//  VOZ
-// ════════════════════════════════════════════════
+// ── Web Speech API ──
 function toggleVoice() {
   if (isRec) { recog && recog.stop(); return; }
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { toast('O reconhecimento de voz funciona no Chrome e Edge.'); return; }
+  if (!SR) { toast('Reconhecimento de voz requer Chrome ou Edge.', 'error'); return; }
   recog = new SR();
   recog.lang = 'pt-BR'; recog.continuous = false;
   recog.interimResults = true; recog.maxAlternatives = 3;
 
   recog.onstart = () => {
     isRec = true;
-    document.getElementById('btnGravar').className = 'btn-gravar gravando';
-    document.getElementById('btnGravar').innerHTML = '<span class="dot"></span> Gravando... toque para parar';
+    document.getElementById('btnVoice').className = 'btn rec';
+    document.getElementById('btnVoice').innerHTML = '<span class="dot"></span>Gravando...';
+    document.getElementById('voiceOut').className = 'voice-out';
+    document.getElementById('voiceOut').innerHTML = '<em style="color:var(--text3)">Fale o local agora...</em>';
     voiceText = '';
   };
+
   recog.onresult = (e) => {
     let interim = '', final = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
@@ -884,229 +455,107 @@ function toggleVoice() {
       else interim += e.results[i][0].transcript;
     }
     if (final) voiceText = final.trim();
-    const txt = voiceText || interim;
-    if (txt) {
-      document.getElementById('vozResultado').classList.add('show');
-      document.getElementById('vozTexto').textContent = txt;
-    }
+    document.getElementById('voiceOut').className = 'voice-out';
+    document.getElementById('voiceOut').textContent = voiceText || interim || '...';
   };
+
   recog.onend = () => {
     isRec = false;
-    document.getElementById('btnGravar').className = 'btn-gravar espera';
-    if (voiceText) {
-      document.getElementById('btnGravar').innerHTML = '<span style="font-size:32px">🔄</span> Gravar novamente';
-      document.getElementById('vozTexto').textContent = voiceText;
-      document.getElementById('vozResultado').classList.add('show');
-      document.getElementById('btnSalvar').style.display = 'flex';
-    } else {
-      document.getElementById('btnGravar').innerHTML = '<span style="font-size:32px">🎙️</span> Toque para falar o local';
-      toast('Nada captado. Tente falar mais perto do celular.');
+    document.getElementById('btnVoice').className = 'btn';
+    document.getElementById('btnVoice').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Falar local`;
+    if (voiceText) saveItem();
+    else {
+      document.getElementById('voiceOut').className = 'voice-out empty';
+      document.getElementById('voiceOut').textContent = 'Nada captado — tente novamente.';
     }
   };
+
   recog.onerror = (e) => {
     isRec = false;
-    document.getElementById('btnGravar').className = 'btn-gravar espera';
-    document.getElementById('btnGravar').innerHTML = '<span style="font-size:32px">🎙️</span> Toque para falar o local';
-    const msgs = { 'no-speech':'Nada captado. Tente novamente.', 'not-allowed':'Permissão de microfone negada.', 'network':'Erro de rede.' };
-    toast(msgs[e.error] || 'Erro: ' + e.error);
+    document.getElementById('btnVoice').className = 'btn';
+    document.getElementById('btnVoice').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Falar local`;
+    const msgs = { 'no-speech':'Nada captado.', 'not-allowed':'Microfone negado.', 'network':'Erro de rede.' };
+    toast(msgs[e.error] || 'Erro: ' + e.error, 'error');
   };
+
   recog.start();
 }
 
-// ════════════════════════════════════════════════
-//  SALVAR
-// ════════════════════════════════════════════════
-function salvarItem() {
+// ── Save ──
+function saveItem() {
   if (!voiceText || !photoThumb) return;
   const now = new Date();
   const item = {
-    id: Date.now(), name: pendingName || 'objeto',
-    location: voiceText, thumb: photoThumb,
+    id: Date.now(),
+    name: pendingName || 'objeto',
+    tags: pendingTags || [],
+    desc: pendingDesc || '',
+    location: voiceText,
+    thumb: photoThumb,
     time: now.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
   };
   items.unshift(item);
   try { localStorage.setItem('ong_items', JSON.stringify(items)); } catch(e) {}
+  render();
 
-  // Mostra sucesso
-  document.getElementById('passo2').style.display = 'none';
-  const sc = document.getElementById('sucessoCard');
-  sc.classList.add('show');
-  document.getElementById('sucessoTexto').textContent = `"${item.name}" está guardado em: ${item.location}`;
-  window.scrollTo(0, 0);
-  fecharLembrete();
-
-  // Reset para próximo uso
-  setTimeout(() => {
-    sc.classList.remove('show');
-    voltarPasso1();
-    document.getElementById('camBox').style.display = 'flex';
-    document.getElementById('btnCam').style.display = 'flex';
-    document.getElementById('btnCam').innerHTML = '<span class="icone">📷</span><span class="txt">Ligar câmera<span class="sub">Aponte para o objeto</span></span>';
-    document.getElementById('btnFoto').style.display = 'flex';
-    const ba = document.getElementById('btnAvancar');
-    if (ba) ba.style.display = 'none';
-    photoData = null; photoThumb = null; pendingName = null; voiceText = '';
-  }, 4000);
+  photoData = null; photoThumb = null; voiceText = '';
+  pendingName = null; pendingTags = []; pendingDesc = '';
+  document.getElementById('voiceOut').className = 'voice-out empty';
+  document.getElementById('voiceOut').textContent = 'Aguardando gravação...';
+  document.getElementById('aiOut').className = 'ai-out';
+  document.getElementById('aiOut').style.color = 'var(--text3)';
+  document.getElementById('aiOut').textContent = 'Tire uma foto para identificar os objetos.';
+  document.getElementById('btnVoice').disabled = true;
+  step(4); setTimeout(() => step(1), 1800);
+  toast('✓ ' + item.name + '\nsalvo em "' + item.location + '"', 'success');
 }
 
-// ════════════════════════════════════════════════
-//  BUSCA E LISTA
-// ════════════════════════════════════════════════
-function renderBusca() {
-  const q = (document.getElementById('buscaInput')?.value || '').toLowerCase().trim();
+// ── Render ──
+function render() {
+  const q = (document.getElementById('search').value || '').toLowerCase().trim();
   const filtered = items.filter(it =>
-    !q || it.name.toLowerCase().includes(q) || it.location.toLowerCase().includes(q)
+    !q ||
+    it.name.toLowerCase().includes(q) ||
+    it.location.toLowerCase().includes(q) ||
+    (it.desc || '').toLowerCase().includes(q) ||
+    (it.tags || []).some(t => t.toLowerCase().includes(q))
   );
-  const el = document.getElementById('listaItens');
-  if (!el) return;
-
+  document.getElementById('lcount').textContent = filtered.length + (filtered.length === 1 ? ' item' : ' itens');
+  const el = document.getElementById('items');
   if (!filtered.length) {
-    el.innerHTML = `<div class="lista-vazia">
-      <span class="icon">${items.length === 0 ? '📦' : '🔍'}</span>
-      <p>${items.length === 0 ? 'Nenhum objeto registrado ainda.<br>Toque em "Guardar" para começar!' : `Nenhum resultado para "${q}".`}</p>
-    </div>`;
+    el.innerHTML = items.length === 0
+      ? '<div class="empty">Nenhum objeto registrado ainda.<br>Tire uma foto e diga onde está guardando.</div>'
+      : `<div class="empty">Nenhum resultado para "${q}".</div>`;
     return;
   }
-
   el.innerHTML = filtered.map(it => `
     <div class="card">
       <img class="thumb" src="${it.thumb}" alt="${it.name}" />
-      <div class="card-info">
-        <div class="card-nome">${it.name}</div>
-        <div class="card-local">📍 ${it.location}</div>
-        <div class="card-data">🕐 ${it.time}</div>
+      <div class="ci">
+        <div class="cn">${it.name}</div>
+        <div class="ctags">${(it.tags||[]).slice(0,4).map(t=>`<span class="ctag">${t}</span>`).join('')}</div>
+        <div class="cl">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          ${it.location}
+        </div>
+        <div class="ct">${it.time}</div>
       </div>
-      <button class="card-del" onclick="deletarItem(${it.id})" title="Remover">🗑️</button>
+      <button class="del" onclick="delItem(${it.id})">✕</button>
     </div>`).join('');
 }
 
-function deletarItem(id) {
-  if (!confirm('Remover este item?')) return;
+function delItem(id) {
   items = items.filter(i => i.id !== id);
   try { localStorage.setItem('ong_items', JSON.stringify(items)); } catch(e) {}
-  renderBusca();
-  toast('Item removido.');
-}
-
-// ════════════════════════════════════════════════
-//  CONFIG
-// ════════════════════════════════════════════════
-function salvarKey() {
-  const v = document.getElementById('apiKey').value.trim();
-  if (!v) { toast('Cole a chave primeiro'); return; }
-  if (!v.startsWith('AIza')) { toast('Chave inválida — deve começar com AIza'); return; }
-  apiKey = v;
-  try { localStorage.setItem('ong_key', v); } catch(e) {}
-  document.getElementById('apiKey').value = '';
-  document.getElementById('apiKey').placeholder = 'Chave salva ✓';
-  document.getElementById('keyStatus').className = 'config-status ok';
-  document.getElementById('keyStatus').textContent = '✓ Chave salva com sucesso!';
-  toast('✓ Chave salva!');
-}
-
-// ════════════════════════════════════════════════
-//  NOTIFICAÇÕES
-// ════════════════════════════════════════════════
-async function toggleNotif() {
-  const on = document.getElementById('notifToggle').checked;
-  document.getElementById('timePicker').style.display = on ? 'block' : 'none';
-  if (!on) {
-    notifTimes = [];
-    localStorage.setItem('ong_notif_times', '[]');
-    updateNotifStatus();
-    return;
-  }
-  const perm = await Notification.requestPermission();
-  if (perm !== 'granted') {
-    document.getElementById('notifToggle').checked = false;
-    document.getElementById('timePicker').style.display = 'none';
-    document.getElementById('notifStatus').textContent = '⚠️ Permissão negada. Ative nas configurações do celular.';
-    return;
-  }
-  updateNotifStatus();
-}
-
-function toggleHorario(chip) {
-  const h = parseInt(chip.dataset.h);
-  chip.classList.toggle('ativo');
-  if (chip.classList.contains('ativo')) {
-    if (!notifTimes.includes(h)) { notifTimes.push(h); agendarNotif(h); }
-  } else {
-    notifTimes = notifTimes.filter(t => t !== h);
-  }
-  notifTimes.sort((a,b) => a-b);
-  localStorage.setItem('ong_notif_times', JSON.stringify(notifTimes));
-  updateNotifStatus();
-}
-
-function updateNotifStatus() {
-  const el = document.getElementById('notifStatus');
-  if (!notifTimes.length) { el.textContent = 'Selecione um horário acima.'; el.className = 'config-status'; return; }
-  const times = notifTimes.map(h => `${String(h).padStart(2,'0')}:00`).join(', ');
-  el.className = 'config-status ok';
-  el.textContent = `✓ Lembretes ativos: ${times}`;
-}
-
-function agendarNotif(h) {
-  const now = new Date();
-  const target = new Date();
-  target.setHours(h, 0, 0, 0);
-  if (target <= now) target.setDate(target.getDate() + 1);
-  const ms = target - now;
-  setTimeout(() => {
-    if (Notification.permission === 'granted' && notifTimes.includes(h)) {
-      new Notification('📦 Onde Guardei?', {
-        body: 'Guardou algo hoje? Registre agora para não esquecer onde está!',
-        tag: 'lembrete-' + h,
-        renotify: true,
-      });
-      agendarNotif(h);
-    }
-  }, ms);
-}
-
-// ════════════════════════════════════════════════
-//  LEMBRETE AO REABRIR
-// ════════════════════════════════════════════════
-function verificarLembrete() {
-  const last = parseInt(localStorage.getItem('ong_last_open') || '0');
-  const now = Date.now();
-  if (last > 0 && (now - last) > 8 * 3600000) {
-    document.getElementById('lembreteReabrir').classList.add('show');
-  }
-  localStorage.setItem('ong_last_open', now.toString());
-}
-
-function fecharLembrete() {
-  document.getElementById('lembreteReabrir').classList.remove('show');
-}
-
-// ════════════════════════════════════════════════
-//  PWA
-// ════════════════════════════════════════════════
-function setupPWA() {
-  const manifest = { name:'Onde Guardei?', short_name:'Onde Guardei', start_url:'./', display:'standalone', background_color:'#f0f0f0', theme_color:'#1a6ef5', icons:[{ src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%231a6ef5'/%3E%3Cpath d='M96 40a40 40 0 0 0-40 40c0 31 40 72 40 72s40-41 40-72a40 40 0 0 0-40-40zm0 54a14 14 0 1 1 0-28 14 14 0 0 1 0 28z' fill='white'/%3E%3C/svg%3E", sizes:'192x192', type:'image/svg+xml' }] };
-  const blob = new Blob([JSON.stringify(manifest)], { type:'application/json' });
-  document.getElementById('manifestLink').setAttribute('href', URL.createObjectURL(blob));
-  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredInstall = e; });
-}
-
-async function instalarApp() {
-  if (deferredInstall) {
-    deferredInstall.prompt();
-    const r = await deferredInstall.userChoice;
-    if (r.outcome === 'accepted') toast('✓ App instalado na tela inicial!');
-    deferredInstall = null;
-  } else {
-    toast('No iPhone: toque em Compartilhar → "Adicionar à Tela de Início"');
-  }
+  render(); toast('Item removido', 'warn');
 }
 
 // ── Toast ──
 let tt;
-function toast(msg) {
+function toast(msg, type='info') {
   const el = document.getElementById('toast');
   el.textContent = msg;
+  el.style.background = type==='success'?'#14532d':type==='error'?'#7f1d1d':type==='warn'?'#78350f':'#1c1b18';
   el.classList.add('show'); clearTimeout(tt);
   tt = setTimeout(() => el.classList.remove('show'), 4000);
 }
