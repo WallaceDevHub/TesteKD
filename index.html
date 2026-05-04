@@ -357,14 +357,10 @@ async function analyzeImage() {
     step(3); return;
   }
 
-  const prompt = `Analise esta imagem e identifique o(s) objeto(s) principal(is).
-Responda APENAS com JSON válido, sem markdown, sem explicações:
-{
-  "nome": "nome principal do objeto em português",
-  "tags": ["tag1", "tag2", "tag3"],
-  "descricao": "descrição curta e específica em português, ex: notebook Dell preto sobre mesa"
-}
-Seja específico: prefira 'tênis Nike branco' a apenas 'sapato'. Use português do Brasil.`;
+  const prompt = `Analise esta imagem e me diga apenas o nome do objeto principal que você vê.
+Responda SOMENTE com o nome do objeto, sem pontuação, sem explicações, sem JSON.
+Seja específico: prefira 'tênis branco' a apenas 'sapato', 'notebook Dell' a apenas 'computador'.
+Use português do Brasil. Máximo 4 palavras.`;
 
   try {
     // Tenta modelos em sequência até um funcionar
@@ -412,39 +408,16 @@ Seja específico: prefira 'tênis Nike branco' a apenas 'sapato'. Use português
     // Remove markdown se vier
     text = text.replace(/```json|```/g, '').trim();
 
-    let parsed;
-    try { parsed = JSON.parse(text); }
-    catch(e) {
-      // Tenta extrair JSON do texto se falhar
-      const match = text.match(/\{[\s\S]*?\}/);
-      if (match) {
-        try { parsed = JSON.parse(match[0]); }
-        catch(e2) { throw new Error('Não foi possível interpretar: ' + text.substring(0, 100)); }
-      } else {
-        // Gemini às vezes responde só em texto sem JSON — extrai o nome direto
-        const lines = text.trim().split('\n').filter(l => l.trim());
-        parsed = {
-          nome: lines[0] ? lines[0].replace(/[*#_]/g, '').trim() : 'objeto',
-          tags: lines.slice(1, 4).map(l => l.replace(/[-*#_]/g, '').trim()).filter(Boolean),
-          descricao: lines[lines.length - 1] || ''
-        };
-      }
-    }
+    // Gemini agora responde só com o nome — limpa qualquer pontuação ou espaço extra
+    const name = text.replace(/[*#_\-\.,"'`]/g, '').trim();
+    if (!name) throw new Error('Não foi possível identificar o objeto.');
 
-    pendingName = parsed.nome || parsed.name || 'objeto';
-    pendingTags = parsed.tags || [];
-    pendingDesc = parsed.descricao || parsed.description || '';
-
-    const tags = pendingTags.slice(0, 4).map(t =>
-      `<span class="tag">${t}</span>`
-    ).join('');
+    pendingName = name;
+    pendingTags = [];
+    pendingDesc = '';
 
     out.className = 'ai-out';
-    out.innerHTML = `
-      <div class="obj-name">${pendingName}</div>
-      ${tags ? `<div class="obj-tags">${tags}</div>` : ''}
-      ${pendingDesc ? `<div class="obj-desc">${pendingDesc}</div>` : ''}
-    `;
+    out.innerHTML = `<div class="obj-name">${pendingName}</div>`;
     step(3);
     toast('Objeto identificado!\nDiga onde vai guardar.', 'success');
 
